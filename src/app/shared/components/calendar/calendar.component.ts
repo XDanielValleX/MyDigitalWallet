@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
+  standalone: false
 })
 export class CalendarComponent  implements OnInit {
 

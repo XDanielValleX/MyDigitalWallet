@@ -1,3 +1,29 @@
-<p>
-  card works!
-</p>
+<div class="credit-card" [class.inactive]="!isActive" [ngClass]="cardType">
+  <div class="card-header">
+    <img src="assets/chip.png" alt="Chip" class="chip" onerror="this.style.display='none'" />
+
+    <div class="brand-logo">
+      <h3 *ngIf="cardType === 'visa'" class="visa-text">VISA</h3>
+      <div *ngIf="cardType === 'mastercard'" class="mastercard-circles">
+        <div class="circle red"></div>
+        <div class="circle orange"></div>
+      </div>
+      <ion-icon *ngIf="cardType === 'unknown'" name="card-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="card-number">
+    {{ maskedNumber }}
+  </div>
+
+  <div class="card-footer">
+    <div class="card-info">
+      <small>Card Holder</small>
+      <p>{{ cardHolder | uppercase }}</p>
+    </div>
+    <div class="card-info text-right">
+      <small>Expires</small>
+      <p>{{ expDate }}</p>
+    </div>
+  </div>
+</div>

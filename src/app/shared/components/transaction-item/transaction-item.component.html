@@ -1,3 +1,14 @@
-<p>
-  transaction-item works!
-</p>
+<ion-item lines="full" class="transaction-item">
+  <div slot="start" class="icon-container" [ngClass]="type">
+    <ion-icon [name]="icon"></ion-icon>
+  </div>
+
+  <ion-label>
+    <h2>{{ title }}</h2>
+    <p>{{ date }}</p>
+  </ion-label>
+
+  <div slot="end" class="amount" [ngClass]="type">
+    {{ type === 'income' ? '+' : '-' }}${{ amount | number:'1.0-0' }}
+  </div>
+</ion-item>

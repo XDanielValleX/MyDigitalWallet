@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-quick-actions',
   templateUrl: './quick-actions.component.html',
   styleUrls: ['./quick-actions.component.scss'],
+  standalone: false
 })
 export class QuickActionsComponent  implements OnInit {
 

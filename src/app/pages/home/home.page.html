@@ -1,13 +1,56 @@
-<ion-header [translucent]="true">
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>home</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="dark">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+      <ion-avatar (click)="openProfile()" class="profile-avatar">
+        <img src="assets/avatar-placeholder.png" />
+      </ion-avatar>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">home</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="welcome-header">
+    <h1>Hello {{ firstName }}!</h1>
+    <p>Let's save your money.</p>
+  </div>
+
+  <div class="card-display-container">
+    <app-card cardNumber="4111 1111 1111 1111" cardHolder="Cesar Diaz" expDate="12/28" [isActive]="true">
+    </app-card>
+
+  </div>
+
+  <div class="quick-actions-grid">
+    <div class="action-item" (click)="openChangeCardModal()">
+      <div class="icon-wrapper teal">
+        <ion-icon name="layers-outline"></ion-icon>
+      </div>
+      <span>Change Card</span>
+    </div>
+
+    <div class="action-item" (click)="goToPayment()">
+      <div class="icon-wrapper lime">
+        <ion-icon name="card-outline"></ion-icon>
+      </div>
+      <span>Pay Now</span>
+    </div>
+
+    <div class="action-item" (click)="addCard()">
+      <div class="icon-wrapper dark">
+        <ion-icon name="add-outline"></ion-icon>
+      </div>
+      <span>Add Card</span>
+    </div>
+  </div>
+
+  <div class="history-header">
+    <h2>Card History</h2>
+    <ion-note color="primary">View All</ion-note>
+  </div>
+
+  <app-transaction-list></app-transaction-list>
+
 </ion-content>

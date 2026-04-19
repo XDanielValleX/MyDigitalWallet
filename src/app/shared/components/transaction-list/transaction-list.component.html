@@ -1,3 +1,10 @@
-<p>
-  transaction-list works!
-</p>
+<ion-list class="ion-no-padding" style="background: transparent;">
+  <app-transaction-item
+    *ngFor="let txn of transactions"
+    [title]="txn.title"
+    [date]="txn.date"
+    [amount]="txn.amount"
+    [type]="txn.type"
+    [icon]="txn.icon">
+  </app-transaction-item>
+</ion-list>

@@ -1,0 +1,124 @@
+// Header y Avatar
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #2b1f6b; // Color de fondo si no hay imagen
+}
+
+// Textos
+.welcome-header {
+    margin-bottom: 30px;
+
+    h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+        color: #1a1e26;
+    }
+
+    p {
+        color: #989aa2;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+}
+
+// Contenedor de Tarjeta
+.card-display-container {
+    min-height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border-radius: 0;
+    margin-bottom: 30px;
+
+    .no-cards-state {
+        text-align: center;
+
+        .placeholder-card-icon {
+            font-size: 80px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #8a8a8a;
+            font-weight: 600;
+        }
+
+        ion-button {
+            --background: #5f6368;
+            font-weight: bold;
+        }
+    }
+}
+
+// Cuadrícula de Acciones (Lo más importante)
+.quick-actions-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+
+    .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 30%;
+
+        .icon-wrapper {
+            width: 65px;
+            height: 65px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+
+            ion-icon {
+                font-size: 30px;
+                color: white;
+            }
+
+            &.teal {
+                background: #1cd1c1;
+            }
+
+            &.lime {
+                background: #b8e23c;
+            }
+
+            &.dark {
+                background: #1a1e26;
+            }
+        }
+
+        span {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1a1e26;
+        }
+    }
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    h2 {
+        font-weight: 800;
+        font-size: 1.4rem;
+        margin: 0;
+    }
+
+    ion-note {
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+}
+
