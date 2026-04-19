@@ -3,14 +3,20 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    // Cuando el usuario entra a la raíz de la app, lo mandamos a los tabs
+    // Cuando el usuario entra a la raíz de la app, lo mandamos al login
     path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+    redirectTo: 'auth',
+    pathMatch: 'full'
   },
   {
-    // Auth queda por fuera porque el Login no lleva barra de navegación abajo
+    // Ruta de Autenticación (Login / Registro)
     path: 'auth',
     loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthPageModule)
+  },
+  {
+    // Ruta principal una vez que el usuario inicia sesión (contendrá el Home, Payment, etc.)
+    path: 'tabs',
+    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   }
 ];
 
