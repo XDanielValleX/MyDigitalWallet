@@ -4,7 +4,7 @@ import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
   {
-    path: 'tabs',
+    path: '',
     component: TabsPage,
     children: [
       {
@@ -12,30 +12,25 @@ const routes: Routes = [
         loadChildren: () => import('../pages/home/home.module').then(m => m.HomePageModule)
       },
       {
-        path: 'add-card',
-        loadChildren: () => import('../pages/add-card/add-card.module').then(m => m.AddCardPageModule)
-      },
-      {
         path: 'payment',
         loadChildren: () => import('../pages/payment/payment.module').then(m => m.PaymentPageModule)
       },
       {
-        // Ruta por defecto cuando se entra a los tabs
+        path: 'add-card',
+        loadChildren: () => import('../pages/add-card/add-card.module').then(m => m.AddCardPageModule)
+      },
+      {
+        // Si el usuario entra a '/tabs' sin especificar a dónde, lo mandamos a 'home'
         path: '',
-        redirectTo: '/tabs/home',
+        redirectTo: 'home',
         pathMatch: 'full'
       }
     ]
-  },
-  {
-    // Redirección inicial
-    path: '',
-    redirectTo: '/tabs/home',
-    pathMatch: 'full'
   }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
 export class TabsPageRoutingModule { }
