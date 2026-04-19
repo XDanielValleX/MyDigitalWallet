@@ -1,0 +1,32 @@
+<ion-content class="ion-padding">
+
+  <div class="ion-text-center ion-margin-top ion-margin-bottom">
+    <h1>MyDigitalWallet 💳</h1>
+    <p>Inicia sesión en tu cuenta</p>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+
+    <ion-input label="Correo Electrónico" labelPlacement="floating" fill="solid" type="email" formControlName="email"
+      class="ion-margin-bottom"></ion-input>
+
+    <ion-input label="Contraseña" labelPlacement="floating" fill="solid" type="password" formControlName="password"
+      class="ion-margin-bottom"></ion-input>
+
+    <ion-button expand="block" type="submit" [disabled]="!loginForm.valid" class="ion-margin-top">
+      Iniciar Sesión
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="dark" (click)="loginWithGoogle()" class="ion-margin-top">
+      <ion-icon name="logo-google" slot="start"></ion-icon>
+      Continuar con Google
+    </ion-button>
+
+  </form>
+
+  <div class="ion-text-center ion-margin-top">
+    <p>¿No tienes una cuenta?</p>
+    <ion-button fill="clear" routerLink="/register">Regístrate aquí</ion-button>
+  </div>
+
+</ion-content>

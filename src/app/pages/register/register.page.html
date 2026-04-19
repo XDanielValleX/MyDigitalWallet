@@ -1,0 +1,53 @@
+<ion-content class="ion-padding">
+
+  <div class="ion-text-center ion-margin-top ion-margin-bottom">
+    <h2>Crear Cuenta</h2>
+    <p>Completa tu perfil para continuar</p>
+  </div>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-input label="Nombre" labelPlacement="floating" fill="solid" type="text"
+          formControlName="firstName"></ion-input>
+      </ion-col>
+      <ion-col size="6">
+        <ion-input label="Apellido" labelPlacement="floating" fill="solid" type="text"
+          formControlName="lastName"></ion-input>
+      </ion-col>
+    </ion-row>
+
+    <ion-select label="Tipo de Documento" labelPlacement="floating" fill="solid" formControlName="docType"
+      class="ion-margin-top">
+      <ion-select-option value="CC">Cédula de Ciudadanía</ion-select-option>
+      <ion-select-option value="CE">Cédula de Extranjería</ion-select-option>
+      <ion-select-option value="PASSPORT">Pasaporte</ion-select-option>
+    </ion-select>
+
+    <ion-input label="Número de Documento" labelPlacement="floating" fill="solid" type="number"
+      formControlName="docNumber" class="ion-margin-top"></ion-input>
+
+    <ion-input label="País" labelPlacement="floating" fill="solid" type="text" formControlName="country"
+      class="ion-margin-top"></ion-input>
+
+    <ion-input label="Correo Electrónico" labelPlacement="floating" fill="solid" type="email" formControlName="email"
+      class="ion-margin-top"></ion-input>
+
+    <ion-input label="Contraseña (Mín. 6)" labelPlacement="floating" fill="solid" type="password"
+      formControlName="password" class="ion-margin-top"></ion-input>
+
+    <ion-button expand="block" type="submit" [disabled]="!registerForm.valid" class="ion-margin-top">
+      Registrarse
+    </ion-button>
+
+  </form>
+
+  <div class="ion-text-center ion-margin-top">
+    <ion-button fill="clear" color="medium" routerLink="/login">
+      <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+      Volver al Inicio
+    </ion-button>
+  </div>
+
+</ion-content>
