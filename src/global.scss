@@ -35,3 +35,28 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Hide scrollbars globally (keep scrolling enabled) */
+html,
+body {
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE/Edge Legacy */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+}
+
+/* Ionic content scroll container lives inside shadow DOM */
+ion-content::part(scroll) {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+ion-content::part(scroll)::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+	display: none;
+}

@@ -1,0 +1,55 @@
+.transaction-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --background: transparent;
+    margin-bottom: 8px;
+
+    .icon-container {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+
+        ion-icon {
+            font-size: 24px;
+        }
+
+        /* Estilo para ingresos (verde) */
+        &.income {
+            background: rgba(var(--ion-color-success-rgb), 0.15);
+            color: var(--ion-color-success);
+        }
+
+        /* Estilo para gastos (rojo/gris) */
+        &.expense {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+    }
+
+    .amount {
+        font-weight: bold;
+        font-size: 1.1rem;
+
+        &.income {
+            color: var(--ion-color-success);
+        }
+
+        &.expense {
+            color: #ffffff;
+        }
+    }
+
+    h2 {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+    }
+
+    p {
+        color: #a0a0a0;
+    }
+}
