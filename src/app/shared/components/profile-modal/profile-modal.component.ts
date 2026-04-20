@@ -37,6 +37,7 @@ export class ProfileModalComponent implements OnInit {
     isLoading = false;
     isSaving = false;
     isUpdatingBiometrics = false;
+    isUpdatingPush = false;
 
     firstName = '';
     lastName = '';
@@ -44,6 +45,8 @@ export class ProfileModalComponent implements OnInit {
     darkMode = false;
 
     pushBackendConfigured = false;
+    pushBackendEmail: string | null = null;
+    pushEnabled = true;
 
     constructor(
         private auth: Auth,
@@ -59,48 +62,144 @@ export class ProfileModalComponent implements OnInit {
 
     ngOnInit() {
         this.darkMode = this.userService.getEffectiveIsDark();
-        this.refreshPushBackendStatus();
+        void this.refreshPushBackendStatus();
         void this.loadProfile();
     }
 
-    private refreshPushBackendStatus() {
-        this.pushBackendConfigured = Boolean(this.http.getStoredNotificationsJwt());
-    }
-
-    async togglePushBackend() {
-        if (this.isLoading || this.isSaving || this.isUpdatingBiometrics) {
+    private async refreshPushBackendStatus(): Promise<void> {
+        const hasJwt = Boolean(this.http.getStoredNotificationsJwt());
+        if (!hasJwt) {
+            this.pushBackendConfigured = false;
+            this.pushBackendEmail = null;
             return;
         }
 
-        if (this.pushBackendConfigured) {
-            this.http.clearStoredNotificationsJwt();
-            this.refreshPushBackendStatus();
-            await this.notify.info('Push service disconnected.');
-            return;
-        }
-
-        const creds = await this.promptPushBackendCredentials();
-        if (!creds) {
-            return;
-        }
+        this.pushBackendEmail = this.http.getStoredNotificationsJwtEmail();
 
         try {
-            await this.http.loginNotificationsBackend(creds.email, creds.password);
-            this.refreshPushBackendStatus();
-            await this.notify.success('Push service connected.');
-        } catch (error) {
-            console.error('Notifications backend login failed:', error);
-            await this.notify.error('No se pudo iniciar sesión en el servicio de notificaciones.');
+            const configured = await this.http.getNotificationsCredentialsStatus();
+            this.pushBackendConfigured = configured === true;
+        } catch {
+            // If the status call fails (expired token, network, etc.), consider it not configured.
+            this.pushBackendConfigured = false;
+        }
+    }
+
+    private describeNotificationsLoginError(error: any): string {
+        const rawMessage = String(error?.message ?? error ?? '').trim();
+        if (!rawMessage) {
+            return 'Error desconocido.';
+        }
+
+        // HttpService throws: "HTTP <status>: <body>"
+        const match = /^HTTP\s+(\d{3}):\s*(.*)$/s.exec(rawMessage);
+        if (!match) {
+            return rawMessage;
+        }
+
+        const status = Number(match[1]);
+        const body = String(match[2] ?? '').trim();
+
+        let msg = body;
+        try {
+            const parsed = JSON.parse(body);
+            msg = String(parsed?.msg ?? parsed?.message ?? parsed?.error ?? body);
+        } catch {
+            // keep raw body
+        }
+
+        const normalized = msg.trim();
+        if (/all\s*field/i.test(normalized)) {
+            return `HTTP ${status}: "All field must set" (suele pasar si el correo NO es @unicolombo.edu.co o faltan campos).`;
+        }
+        if (status === 401 || status === 403 || /invalid|credencial/i.test(normalized)) {
+            return `HTTP ${status}: Credenciales inválidas.`;
+        }
+        if (status >= 500) {
+            return `HTTP ${status}: Error del servidor de notificaciones.`;
+        }
+
+        return `HTTP ${status}: ${normalized || 'Error'}`;
+    }
+
+    async onPushToggle(ev: CustomEvent) {
+        const nextEnabled = Boolean((ev as any)?.detail?.checked);
+
+        if (this.isUpdatingPush) {
+            return;
+        }
+
+        const user = this.auth.currentUser;
+        if (!user) {
+            this.pushEnabled = false;
+            await this.notify.error('You must be logged in.');
+            return;
+        }
+
+        this.isUpdatingPush = true;
+        try {
+            if (!nextEnabled) {
+                this.pushEnabled = false;
+                await this.persistPushEnabled(user.uid, false);
+                // Clear backend session so re-enabling forces a fresh login (helps when switching NotifyPro accounts).
+                this.http.clearStoredNotificationsJwt();
+                await this.refreshPushBackendStatus();
+                await this.notify.info('Notificaciones desactivadas.');
+                return;
+            }
+
+            // Enabling push: ensure the notifications backend JWT is configured.
+            await this.refreshPushBackendStatus();
+
+            // If backend is not configured (either no JWT, expired JWT, or missing Firebase JSON), prompt login.
+            if (!this.pushBackendConfigured) {
+                const creds = await this.promptPushBackendCredentials();
+                if (!creds) {
+                    this.pushEnabled = false;
+                    await this.persistPushEnabled(user.uid, false);
+                    return;
+                }
+
+                try {
+                    await this.http.loginNotificationsBackend(creds.email, creds.password);
+                } catch (error) {
+                    console.error('Notifications backend login failed:', error);
+                    this.pushEnabled = false;
+                    await this.persistPushEnabled(user.uid, false);
+                    await this.notify.error(`No se pudo iniciar sesión: ${this.describeNotificationsLoginError(error)}`);
+                    return;
+                }
+
+                await this.refreshPushBackendStatus();
+            }
+
+            if (!this.pushBackendConfigured) {
+                const email = this.http.getStoredNotificationsJwtEmail();
+                const who = email ? ` (${email})` : '';
+                await this.notify.info(
+                    `NotifyPro no está configurado${who}: entra al Dashboard y sube el JSON de Firebase Admin SDK para poder enviar notificaciones.`
+                );
+            }
+
+            this.pushEnabled = true;
+            await this.persistPushEnabled(user.uid, true);
+            await this.notify.success('Notificaciones activadas.');
+        } finally {
+            this.isUpdatingPush = false;
         }
     }
 
     private async promptPushBackendCredentials(): Promise<{ email: string; password: string } | null> {
         let email = String(this.auth.currentUser?.email ?? '').trim();
+        if (email && !email.toLowerCase().endsWith('@unicolombo.edu.co')) {
+            // NotifyPro backend appears to be restricted to institutional emails.
+            email = '';
+        }
         let password = '';
 
         const alert = await this.alertCtrl.create({
-            header: 'Push Service (Railway)',
-            message: 'Ingresa tus credenciales del panel NotifyPro para habilitar notificaciones push.',
+            header: 'Notificaciones push',
+            message: 'Ingresa tus credenciales de NotifyPro. Nota: el backend solo acepta correos @unicolombo.edu.co.',
             inputs: [
                 {
                     name: 'email',
@@ -156,6 +255,18 @@ export class ProfileModalComponent implements OnInit {
         }
 
         return { email, password };
+    }
+
+    private async persistPushEnabled(uid: string, enabled: boolean): Promise<void> {
+        const userRef = runInInjectionContext(this.injector, () => doc(this.firestore, `users/${uid}`));
+        await runInInjectionContext(this.injector, () => setDoc(
+            userRef,
+            {
+                pushEnabled: enabled,
+                updatedAt: new Date().toISOString()
+            },
+            { merge: true }
+        ));
     }
 
     onDarkModeChanged(ev: CustomEvent) {
@@ -216,6 +327,7 @@ export class ProfileModalComponent implements OnInit {
             this.firstName = data.firstName ?? '';
             this.lastName = data.lastName ?? '';
             this.biometricsEnabled = Boolean(data.biometricsEnabled);
+            this.pushEnabled = data.pushEnabled !== false;
         } catch (error) {
             console.error('Error loading profile:', error);
         } finally {
@@ -238,6 +350,7 @@ export class ProfileModalComponent implements OnInit {
                     firstName: (this.firstName || '').trim(),
                     lastName: (this.lastName || '').trim(),
                     biometricsEnabled: this.biometricsEnabled,
+                    pushEnabled: this.pushEnabled,
                     updatedAt: new Date().toISOString()
                 },
                 { merge: true }

@@ -19,7 +19,15 @@ describe('PaymentSimulatorComponent', () => {
         { provide: PaymentService, useValue: { process: async () => 'mock-id' } },
         { provide: NotificationService, useValue: { info: async () => { }, error: async () => { } } },
         { provide: UserService, useValue: { ensurePushToken: async () => null } },
-        { provide: HttpService, useValue: { sendPushNotificationIfConfigured: async () => false } }
+        {
+          provide: HttpService,
+          useValue: {
+            sendPushNotificationIfConfigured: async () => false,
+            getStoredNotificationsJwt: () => null,
+            getStoredNotificationsJwtEmail: () => null,
+            getNotificationsCredentialsStatus: async () => null
+          }
+        }
       ]
     }).compileComponents();
 

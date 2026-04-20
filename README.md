@@ -77,7 +77,7 @@ Para la gestión de notificaciones push, se utiliza un servicio externo alojado 
 **Conexión desde la app (JWT):** Para que la app pueda enviar notificaciones a través del backend, debe obtener un JWT.
 
 - Si inicias sesión con **email/contraseña**, la app intentará autenticar automáticamente en el backend.
-- Si inicias sesión con **Google**, abre **Perfil (avatar) → Push Service (Railway) → CONNECT** e ingresa tus credenciales del panel NotifyPro. Esto guarda el JWT en el dispositivo y habilita el envío de push al finalizar pagos.
+- Si inicias sesión con **Google**, abre **Perfil (avatar) → Push Notifications** y actívalas. Si la app no tiene JWT aún, te pedirá las credenciales del panel NotifyPro para guardarlo en el dispositivo y habilitar el envío de push al finalizar pagos.
 
 ### Endpoints del Servicio
 

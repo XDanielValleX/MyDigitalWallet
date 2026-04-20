@@ -21,6 +21,7 @@ export class PaymentPage implements OnInit {
   card: any | null = null;
   balance = 0;
   biometricsEnabled = false;
+  pushEnabled = true;
 
   readonly backIcon = arrowBackOutline;
 
@@ -81,6 +82,7 @@ export class PaymentPage implements OnInit {
       const profile = await this.userService.getProfile(user.uid);
       const preferredCardId = (profile as any)?.defaultCardId as string | null | undefined;
       this.biometricsEnabled = Boolean((profile as any)?.biometricsEnabled);
+      this.pushEnabled = (profile as any)?.pushEnabled !== false;
 
       const cards = await this.firestore.list<any>(`users/${user.uid}/cards`);
       const chosen = preferredCardId
@@ -122,6 +124,7 @@ export class PaymentPage implements OnInit {
           cardId: this.cardId,
           card: this.card,
           biometricsEnabled: this.biometricsEnabled,
+          pushEnabled: this.pushEnabled,
           variant: 'status',
           autoStart: true,
           merchant: this.merchant,
