@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { NativeBiometric } from 'capacitor-native-biometric';
 import { AlertController, ModalController } from '@ionic/angular';
 import { NotificationService } from '../../../core/services/notification';
+import { HttpService } from '../../../core/services/http';
 import { UserService } from '../../../core/services/user';
 import {
     cameraOutline,
@@ -13,6 +14,7 @@ import {
     fingerPrintOutline,
     logOutOutline,
     moonOutline,
+    notificationsOutline,
     personOutline
 } from 'ionicons/icons';
 
@@ -30,6 +32,7 @@ export class ProfileModalComponent implements OnInit {
     readonly fingerIcon = fingerPrintOutline;
     readonly logoutIcon = logOutOutline;
     readonly moonIcon = moonOutline;
+    readonly notificationsIcon = notificationsOutline;
 
     isLoading = false;
     isSaving = false;
@@ -40,6 +43,8 @@ export class ProfileModalComponent implements OnInit {
     biometricsEnabled = false;
     darkMode = false;
 
+    pushBackendConfigured = false;
+
     constructor(
         private auth: Auth,
         private firestore: Firestore,
@@ -47,13 +52,110 @@ export class ProfileModalComponent implements OnInit {
         private alertCtrl: AlertController,
         private router: Router,
         private userService: UserService,
+        private http: HttpService,
         private notify: NotificationService,
         private injector: Injector
     ) { }
 
     ngOnInit() {
         this.darkMode = this.userService.getEffectiveIsDark();
+        this.refreshPushBackendStatus();
         void this.loadProfile();
+    }
+
+    private refreshPushBackendStatus() {
+        this.pushBackendConfigured = Boolean(this.http.getStoredNotificationsJwt());
+    }
+
+    async togglePushBackend() {
+        if (this.isLoading || this.isSaving || this.isUpdatingBiometrics) {
+            return;
+        }
+
+        if (this.pushBackendConfigured) {
+            this.http.clearStoredNotificationsJwt();
+            this.refreshPushBackendStatus();
+            await this.notify.info('Push service disconnected.');
+            return;
+        }
+
+        const creds = await this.promptPushBackendCredentials();
+        if (!creds) {
+            return;
+        }
+
+        try {
+            await this.http.loginNotificationsBackend(creds.email, creds.password);
+            this.refreshPushBackendStatus();
+            await this.notify.success('Push service connected.');
+        } catch (error) {
+            console.error('Notifications backend login failed:', error);
+            await this.notify.error('No se pudo iniciar sesión en el servicio de notificaciones.');
+        }
+    }
+
+    private async promptPushBackendCredentials(): Promise<{ email: string; password: string } | null> {
+        let email = String(this.auth.currentUser?.email ?? '').trim();
+        let password = '';
+
+        const alert = await this.alertCtrl.create({
+            header: 'Push Service (Railway)',
+            message: 'Ingresa tus credenciales del panel NotifyPro para habilitar notificaciones push.',
+            inputs: [
+                {
+                    name: 'email',
+                    type: 'email',
+                    placeholder: 'correo@unicolombo.edu.co',
+                    value: email,
+                    attributes: {
+                        autocapitalize: 'off',
+                        autocomplete: 'email',
+                    }
+                },
+                {
+                    name: 'password',
+                    type: 'password',
+                    placeholder: 'Password',
+                    attributes: {
+                        autocapitalize: 'off',
+                        autocomplete: 'current-password',
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Connect',
+                    role: 'confirm',
+                    handler: (data) => {
+                        email = String((data as any)?.email ?? '').trim();
+                        password = String((data as any)?.password ?? '');
+                    }
+                }
+            ],
+            backdropDismiss: false,
+        });
+
+        await alert.present();
+        const result = await alert.onDidDismiss();
+        if (result.role !== 'confirm') {
+            return null;
+        }
+
+        if (!email) {
+            await this.notify.error('Email is required.');
+            return null;
+        }
+
+        if (!password) {
+            await this.notify.error('Password is required.');
+            return null;
+        }
+
+        return { email, password };
     }
 
     onDarkModeChanged(ev: CustomEvent) {

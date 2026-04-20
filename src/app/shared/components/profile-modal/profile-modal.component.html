@@ -49,6 +49,23 @@
       </ion-item>
 
       <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="notificationsIcon" aria-hidden="true"></ion-icon>
+        <ion-label>
+          <div>Push Service (Railway)</div>
+          <ion-note color="medium">{{ pushBackendConfigured ? 'Configurado' : 'No configurado' }}</ion-note>
+        </ion-label>
+        <ion-button
+          slot="end"
+          size="small"
+          fill="outline"
+          type="button"
+          (click)="togglePushBackend()"
+          [disabled]="isLoading || isSaving || isUpdatingBiometrics">
+          {{ pushBackendConfigured ? 'DISCONNECT' : 'CONNECT' }}
+        </ion-button>
+      </ion-item>
+
+      <ion-item class="mdw-profile-item" lines="none">
         <ion-icon slot="start" [icon]="moonIcon" aria-hidden="true"></ion-icon>
         <ion-label>Dark Mode</ion-label>
         <ion-toggle
