@@ -74,6 +74,11 @@ Para la gestión de notificaciones push, se utiliza un servicio externo alojado 
 > **Gestión de Credenciales**: Es necesario subir las credenciales (archivo JSON de Firebase Admin SDK) en el link anterior para que el servicio pueda enviar las notificaciones.
 > **Acceso al Frontend**: El link cuenta con un frontend donde se pueden gestionar las configuraciones. Solo pueden iniciar sesión correos con dominio `@unicolombo.edu.co`.
 
+**Conexión desde la app (JWT):** Para que la app pueda enviar notificaciones a través del backend, debe obtener un JWT.
+
+- Si inicias sesión con **email/contraseña**, la app intentará autenticar automáticamente en el backend.
+- Si inicias sesión con **Google**, abre **Perfil (avatar) → Push Service (Railway) → CONNECT** e ingresa tus credenciales del panel NotifyPro. Esto guarda el JWT en el dispositivo y habilita el envío de push al finalizar pagos.
+
 ### Endpoints del Servicio
 
 ### 1. Autenticación (Login)
