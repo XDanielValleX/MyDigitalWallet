@@ -50,7 +50,31 @@ export class LoginPage implements OnInit {
       await this.router.navigate(['/tabs']).catch(() => window.location.assign('/tabs'));
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
-      await this.notify.error('No se pudo iniciar sesión con Google.');
+      await this.notify.error(this.getGoogleLoginErrorMessage(error));
     }
+  }
+
+  private getGoogleLoginErrorMessage(error: any): string {
+    const message = String(error?.message ?? '').trim();
+    const code = String(error?.code ?? '').trim();
+
+    // Common Android misconfiguration: missing SHA fingerprints in Firebase/Google console.
+    if (
+      message.includes('DEVELOPER_ERROR') ||
+      message.includes('Error 10') ||
+      /\b10\b/.test(message)
+    ) {
+      return 'Google: falta registrar SHA-1/SHA-256 en Firebase (Android) y descargar el nuevo google-services.json.';
+    }
+
+    if (code === 'auth/operation-not-allowed') {
+      return 'Google: habilita el proveedor Google en Firebase Authentication.';
+    }
+
+    if (code === 'auth/invalid-credential') {
+      return 'Google: credencial inválida. Revisa SHA + google-services.json (Android).';
+    }
+
+    return message ? `No se pudo iniciar sesión con Google: ${message}` : 'No se pudo iniciar sesión con Google.';
   }
 }

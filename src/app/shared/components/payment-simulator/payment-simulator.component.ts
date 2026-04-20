@@ -36,6 +36,7 @@ export class PaymentSimulatorComponent {
   @Input() cardId: string | null = null;
   @Input() card: any | null = null;
   @Input() biometricsEnabled = false;
+  @Input() pushEnabled = true;
 
   @Input() variant: PaymentSimulatorVariant = 'full';
   @Input() autoStart = false;
@@ -270,20 +271,114 @@ export class PaymentSimulatorComponent {
     return true;
   }
 
+  private describePushSendError(error: any): string {
+    const rawMessage = String((error as any)?.message ?? error ?? '').trim();
+    if (!rawMessage) {
+      return 'Error desconocido.';
+    }
+
+    // HttpService throws:
+    // - Native: "HTTP <status>: <body>"
+    // - Web:    "HTTP <status> <statusText>: <body>"
+    const match = /^HTTP\s+(\d{3})(?:\s+[^:]+)?:\s*(.*)$/s.exec(rawMessage);
+    if (!match) {
+      return rawMessage;
+    }
+
+    const status = Number(match[1]);
+    const body = String(match[2] ?? '').trim();
+
+    let msg = body;
+    try {
+      const parsed = JSON.parse(body);
+      msg = String(
+        parsed?.extra?.message ??
+        parsed?.msg ??
+        parsed?.message ??
+        parsed?.error ??
+        body
+      );
+    } catch {
+      // Keep raw body.
+    }
+
+    const normalized = msg.trim();
+    if (!normalized) {
+      return `HTTP ${status}`;
+    }
+
+    if (/cert\s+not\s+found/i.test(normalized)) {
+      return 'Falta subir el JSON de Firebase Admin en NotifyPro (Cert not found).';
+    }
+
+    if (/senderid\s+mismatch/i.test(normalized)) {
+      return 'El JSON subido NO corresponde al Firebase de esta app (SenderId mismatch).';
+    }
+
+    if (/registration-token-not-registered|requested\s+entity\s+was\s+not\s+found/i.test(normalized)) {
+      return 'El token FCM del dispositivo ya no es válido (token no registrado).';
+    }
+
+    if (status === 401 || status === 403) {
+      return 'Sesión de NotifyPro inválida o expirada (vuelve a iniciar sesión en Notificaciones).';
+    }
+
+    return `HTTP ${status}: ${normalized}`;
+  }
+
   private async sendPushConfirmation(uid: string): Promise<void> {
-    const token = await this.users.ensurePushToken(uid);
-    if (!token) {
+    if (!this.pushEnabled) {
       return;
     }
 
-    await this.http.sendPushNotificationIfConfigured({
-      token,
-      title: 'Payment Successful',
-      body: `You have successfully paid an amount of ${this.amountLabel}.`,
-      data: {
-        merchant: this.merchant,
-        amount: String(this.amount)
+    const token = await this.users.ensurePushToken(uid);
+    if (!token) {
+      await this.notify.info('No se pudo obtener el token de notificaciones (permiso denegado o no disponible).');
+      return;
+    }
+
+    const jwt = this.http.getStoredNotificationsJwt();
+    if (!jwt) {
+      await this.notify.info('Push no configurado: inicia sesión en el servicio de notificaciones (ver README) para poder enviarlas.');
+      return;
+    }
+
+    try {
+      const configured = await this.http.getNotificationsCredentialsStatus();
+      if (configured === false) {
+        const email = this.http.getStoredNotificationsJwtEmail();
+        const who = email ? ` (${email})` : '';
+        await this.notify.info(
+          `NotifyPro${who} no tiene Firebase configurado. Entra al Dashboard y sube el JSON de Firebase Admin SDK.`
+        );
+        return;
       }
-    });
+    } catch (err) {
+      // If status fails, still attempt send and surface the real error.
+      console.warn('Unable to check NotifyPro credentials status:', err);
+    }
+
+    let sent = false;
+    try {
+      sent = await this.http.sendPushNotificationIfConfigured({
+        token,
+        title: 'Payment Successful',
+        body: `You have successfully paid an amount of ${this.amountLabel}.`,
+        data: {
+          merchant: this.merchant,
+          amount: String(this.amount)
+        }
+      });
+    } catch (err) {
+      console.warn('Push notification failed:', err);
+      const email = this.http.getStoredNotificationsJwtEmail();
+      const who = email ? ` (${email})` : '';
+      await this.notify.error(`No se pudo enviar la notificación push${who}: ${this.describePushSendError(err)}`);
+      return;
+    }
+
+    if (!sent) {
+      await this.notify.info('Push no configurado: inicia sesión en el servicio de notificaciones (ver README) para poder enviarlas.');
+    }
   }
 }

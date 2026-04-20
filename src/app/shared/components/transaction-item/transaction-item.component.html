@@ -1,12 +1,7 @@
 <ion-item
   lines="full"
   class="transaction-item"
-  (click)="onTap()"
-  (pointerdown)="onPressStart($event)"
-  (pointermove)="onPressMove($event)"
-  (pointerup)="onPressEnd()"
-  (pointercancel)="onPressEnd()"
-  (pointerleave)="onPressEnd()">
+  (click)="onTap()">
   <div slot="start" class="icon-container" [ngClass]="type">
     <ion-icon [name]="icon"></ion-icon>
   </div>

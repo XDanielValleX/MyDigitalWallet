@@ -17,6 +17,7 @@ export type UserProfile = {
   country?: string;
   defaultCardId?: string | null;
   biometricsEnabled?: boolean;
+  pushEnabled?: boolean;
   pushToken?: string;
   createdAt?: any;
   updatedAt?: any;

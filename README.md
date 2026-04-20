@@ -39,7 +39,7 @@ Tras la revisión del proyecto, se han consolidado las siguientes reglas de nego
 - **Autorización de Pagos**: Si el perfil tiene habilitada la biometría, cada pago requerirá una validación de identidad (Biometría o PIN del dispositivo) antes de procesarse.
 - **Simulación de Datos**: Uso de `faker.js` para generar comercios y montos realistas en la interfaz de simulación de pagos.
 - **Trazabilidad**: Registro detallado en Firestore por transacción (cardId, merchant, amount, date) para permitir el filtrado histórico por tarjeta.
-- **Personalización con Emojis**: Los usuarios pueden asignar y reaccionar a sus gastos mediante Emojis utilizando una **pulsación larga de 2 segundos** sobre cualquier item del historial, integrando la librería `@ctrl/ngx-emoji-mart`.
+- **Personalización con Emojis**: Los usuarios pueden asignar y reaccionar a sus gastos mediante Emojis con un **tap/click** sobre cualquier item del historial, integrando la librería `@ctrl/ngx-emoji-mart`.
 - **Búsqueda por Fecha**: Filtrado dinámico de transacciones por día específico mediante el uso del **CalendarComponent**, facilitando el control de gastos diarios.
 - **Notificaciones**: Envío de confirmación mediante notificaciones push nativas al concluir transacciones exitosas.
 
@@ -73,6 +73,11 @@ Para la gestión de notificaciones push, se utiliza un servicio externo alojado 
 > [!IMPORTANT]
 > **Gestión de Credenciales**: Es necesario subir las credenciales (archivo JSON de Firebase Admin SDK) en el link anterior para que el servicio pueda enviar las notificaciones.
 > **Acceso al Frontend**: El link cuenta con un frontend donde se pueden gestionar las configuraciones. Solo pueden iniciar sesión correos con dominio `@unicolombo.edu.co`.
+
+**Conexión desde la app (JWT):** Para que la app pueda enviar notificaciones a través del backend, debe obtener un JWT.
+
+- Si inicias sesión con **email/contraseña**, la app intentará autenticar automáticamente en el backend.
+- Si inicias sesión con **Google**, abre **Perfil (avatar) → Push Notifications** y actívalas. Si la app no tiene JWT aún, te pedirá las credenciales del panel NotifyPro para guardarlo en el dispositivo y habilitar el envío de push al finalizar pagos.
 
 ### Endpoints del Servicio
 

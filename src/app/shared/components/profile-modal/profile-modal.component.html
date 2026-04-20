@@ -49,6 +49,29 @@
       </ion-item>
 
       <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="notificationsIcon" aria-hidden="true"></ion-icon>
+        <ion-label>
+          <div>Push Notifications</div>
+          <ion-note color="medium">
+            {{
+              pushEnabled
+                ? (
+                    (pushBackendConfigured ? 'Activadas' : 'Falta configurar') +
+                    (pushBackendEmail ? (' (' + pushBackendEmail + ')') : '')
+                  )
+                : 'Desactivadas'
+            }}
+          </ion-note>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          color="success"
+          [(ngModel)]="pushEnabled"
+          (ionChange)="onPushToggle($event)"
+          [disabled]="isLoading || isSaving || isUpdatingBiometrics || isUpdatingPush"></ion-toggle>
+      </ion-item>
+
+      <ion-item class="mdw-profile-item" lines="none">
         <ion-icon slot="start" [icon]="moonIcon" aria-hidden="true"></ion-icon>
         <ion-label>Dark Mode</ion-label>
         <ion-toggle
@@ -66,7 +89,7 @@
         class="mdw-profile-save"
         type="button"
         (click)="saveChanges()"
-        [disabled]="isSaving || isUpdatingBiometrics">
+        [disabled]="isSaving || isUpdatingBiometrics || isUpdatingPush">
         {{ isSaving ? 'SAVING...' : 'SAVE CHANGES' }}
       </ion-button>
 
