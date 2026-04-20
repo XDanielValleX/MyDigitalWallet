@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { UserService } from '../../../core/services/user';
 
 @Component({
   selector: 'app-balance-display',
@@ -7,10 +9,16 @@ import { Component } from '@angular/core';
   standalone: false
 })
 export class BalanceDisplayComponent {
-  balance: number = 150000; // Saldo simulado temporal
-  showBalance: boolean = true; // Interruptor para ocultar/mostrar
+  @Input() totalBalance: number = 0;
+  isVisible: boolean = true;
 
-  toggleBalance() {
-    this.showBalance = !this.showBalance;
+  constructor(private userService: UserService) {
+    this.isVisible = this.userService.getBalanceVisible();
+  }
+
+  async toggleVisibility() {
+    await Haptics.impact({ style: ImpactStyle.Light });
+    this.isVisible = !this.isVisible;
+    this.userService.setBalanceVisible(this.isVisible);
   }
 }

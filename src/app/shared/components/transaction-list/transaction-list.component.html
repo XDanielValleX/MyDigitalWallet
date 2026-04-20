@@ -1,10 +1,19 @@
-<ion-list class="ion-no-padding" style="background: transparent;">
-  <app-transaction-item
-    *ngFor="let txn of transactions"
-    [title]="txn.title"
-    [date]="txn.date"
-    [amount]="txn.amount"
-    [type]="txn.type"
-    [icon]="txn.icon">
-  </app-transaction-item>
-</ion-list>
+<ng-container *ngIf="transactions?.length; else empty">
+  <ion-list class="ion-no-padding" style="background: transparent;">
+    <app-transaction-item
+      *ngFor="let txn of transactions"
+      [title]="txn.title"
+      [date]="txn.date"
+      [amount]="txn.amount"
+      [type]="txn.type"
+      [icon]="txn.icon"
+      [reaction]="txn.reaction ?? null"
+      [enableReactions]="enableReactions"
+      (reactionLongPress)="reactionRequested.emit(txn)">
+    </app-transaction-item>
+  </ion-list>
+</ng-container>
+
+<ng-template #empty>
+  <p class="empty-history">No transactions with this selected card.</p>
+</ng-template>

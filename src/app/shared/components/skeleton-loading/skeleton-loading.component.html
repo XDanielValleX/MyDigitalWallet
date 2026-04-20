@@ -1,3 +1,41 @@
-<p>
-  skeleton-loading works!
-</p>
+<ng-container [ngSwitch]="variant">
+  <!-- Card preview skeleton -->
+  <div *ngSwitchCase="'card'" class="mdw-skeleton-card" aria-hidden="true">
+    <div class="mdw-skeleton-row mdw-skeleton-row--top">
+      <ion-skeleton-text animated class="mdw-skeleton-pill"></ion-skeleton-text>
+      <ion-skeleton-text animated class="mdw-skeleton-brand"></ion-skeleton-text>
+    </div>
+
+    <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--name"></ion-skeleton-text>
+    <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--number"></ion-skeleton-text>
+
+    <div class="mdw-skeleton-row mdw-skeleton-row--bottom">
+      <ion-skeleton-text animated class="mdw-skeleton-exp"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <!-- Transactions list skeleton -->
+  <ion-list *ngSwitchCase="'transactions'" class="mdw-skeleton-list" lines="none" aria-hidden="true">
+    <ion-item *ngFor="let _ of items" lines="none" class="mdw-skeleton-item">
+      <div slot="start" class="mdw-skeleton-icon">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </div>
+
+      <ion-label>
+        <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--title"></ion-skeleton-text>
+        <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--date"></ion-skeleton-text>
+      </ion-label>
+
+      <ion-skeleton-text slot="end" animated class="mdw-skeleton-amount"></ion-skeleton-text>
+    </ion-item>
+  </ion-list>
+
+  <!-- Home default skeleton (card + list) -->
+  <div *ngSwitchDefault class="mdw-skeleton-home" aria-hidden="true">
+    <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--hello"></ion-skeleton-text>
+    <ion-skeleton-text animated class="mdw-skeleton-line mdw-skeleton-line--subtitle"></ion-skeleton-text>
+
+    <app-skeleton-loading variant="card"></app-skeleton-loading>
+    <app-skeleton-loading variant="transactions" [count]="count"></app-skeleton-loading>
+  </div>
+</ng-container>

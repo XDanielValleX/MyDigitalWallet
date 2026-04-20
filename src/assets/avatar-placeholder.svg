@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Avatar placeholder">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#2d3446"/>
+      <stop offset="100%" stop-color="#111e30"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a2e232"/>
+      <stop offset="100%" stop-color="#7ecb1a"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="128" cy="128" r="124" fill="url(#ring)"/>
+  <circle cx="128" cy="128" r="114" fill="url(#bg)"/>
+
+  <!-- Simple card glyph -->
+  <g fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+    <rect x="66" y="88" width="124" height="84" rx="18"/>
+    <path d="M66 112h124"/>
+    <path d="M92 148h44"/>
+    <path d="M92 166h26"/>
+  </g>
+</svg>

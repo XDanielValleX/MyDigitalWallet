@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-card',
@@ -6,7 +6,7 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./card.component.scss'],
   standalone: false
 })
-export class CardComponent implements OnInit {
+export class CardComponent implements OnInit, OnChanges {
   @Input() cardNumber: string = '**** **** **** ****';
   @Input() cardHolder: string = 'NOMBRE APELLIDO';
   @Input() expDate: string = 'MM/YY';
@@ -16,6 +16,12 @@ export class CardComponent implements OnInit {
 
   ngOnInit() {
     this.detectCardType();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['cardNumber']) {
+      this.detectCardType();
+    }
   }
 
   // Detecta la franquicia basándose en las reglas del Notion

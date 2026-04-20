@@ -34,7 +34,10 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+@import "@ionic/angular/css/palettes/dark.class.css";
+
+/* Emoji picker (View All reactions) */
+@import "@ctrl/ngx-emoji-mart/picker";
 
 /* Hide scrollbars globally (keep scrolling enabled) */
 html,
@@ -49,14 +52,1199 @@ body::-webkit-scrollbar {
 	height: 0;
 }
 
+/* Add Card: evita que el redondeado muestre negro detrás */
+app-add-card ion-header {
+	--background: var(--ion-background-color);
+	background: var(--ion-background-color);
+}
+
+/* Evita que Ionic empuje el contenido con padding extra al abrir teclado */
+app-add-card ion-content {
+	--keyboard-offset: 0px !important;
+}
+
+/* Add Card: fondo consistente */
+app-add-card,
+app-add-card.ion-page {
+	height: 100vh;
+	height: 100lvh;
+	background: var(--ion-background-color);
+}
+
+/* Add Card: layout en columna (sin scroll) */
+app-add-card ion-content .main-content.main-content {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Add Card: botón siempre debajo de los campos */
+app-add-card ion-content .footer-btn-container {
+	margin-top: auto;
+	padding-bottom: calc(10px + env(safe-area-inset-bottom));
+	transform: translateY(0px);
+	will-change: transform;
+}
+
+/* Cuando se abre el teclado, empuja el botón hacia abajo para que el teclado lo cubra */
+app-add-card.mdw-keyboard-open ion-content .footer-btn-container {
+	transform: translateY(var(--mdw-kb-height, 0px));
+}
+
+/* Add Card: compacta UI cuando se abre el teclado (sin mover el botón con transforms) */
+app-add-card.mdw-keyboard-open .header-design {
+	padding-bottom: 10px;
+	border-bottom-left-radius: 26px;
+	border-bottom-right-radius: 26px;
+}
+
+app-add-card.mdw-keyboard-open .header-text-container {
+	display: none;
+}
+
+app-add-card.mdw-keyboard-open .card-wrapper {
+	margin-bottom: 12px;
+}
+
+app-add-card.mdw-keyboard-open .preview-card {
+	height: 130px;
+	padding: 16px;
+}
+
+app-add-card.mdw-keyboard-open .preview-card .preview-card-number {
+	font-size: 0.95rem;
+}
+
+app-add-card.mdw-keyboard-open .main-content {
+	padding-top: 12px;
+}
+
+app-add-card.mdw-keyboard-open .pill-input {
+	margin-bottom: 12px;
+}
+
+app-add-card.mdw-keyboard-open .pill-input ion-label {
+	font-size: 11px;
+	margin-bottom: 6px;
+}
+
+app-add-card.mdw-keyboard-open .pill-input ion-input {
+	--padding-top: 10px;
+	--padding-bottom: 10px;
+}
+
+/* Add Card: acciones debajo del form (no fixed) */
+app-add-card .footer-btn-container {
+	padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+app-add-card .green-submit-btn {
+	margin-bottom: 0;
+}
+
+/* Add Card: inputs realmente redondeados (evita “cuadrado” alrededor) */
+app-add-card .pill-input ion-input {
+	--border-radius: 16px;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+app-add-card .pill-input ion-input::part(native) {
+	border-radius: 16px;
+}
+
+/* Add Card: back button visible en header oscuro */
+app-add-card .mdw-back-btn {
+	--color: #ffffff;
+	--padding-start: 6px;
+	--padding-end: 6px;
+	min-width: 44px;
+	min-height: 44px;
+}
+
+app-add-card .mdw-back-btn ion-icon {
+	font-size: 24px;
+}
+
+/* Add Card: cambia el preview según franquicia (mientras escribes) */
+app-add-card .preview-card.visa {
+	background: linear-gradient(135deg, #0f509e, #1399cd);
+}
+
+app-add-card .preview-card.mastercard {
+	background: linear-gradient(135deg, rgba(235, 0, 27, 0.9), rgba(247, 158, 27, 0.9));
+}
+
+app-add-card .preview-brand {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	min-width: 64px;
+}
+
+app-add-card .preview-brand .visa-text {
+	font-weight: 900;
+	font-style: italic;
+	letter-spacing: 0.5px;
+}
+
+app-add-card .preview-brand .mastercard-circles {
+	display: flex;
+}
+
+app-add-card .preview-brand .mastercard-circles .circle {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+}
+
+app-add-card .preview-brand .mastercard-circles .circle.red {
+	background: rgba(235, 0, 27, 0.9);
+	z-index: 2;
+}
+
+app-add-card .preview-brand .mastercard-circles .circle.orange {
+	background: rgba(247, 158, 27, 0.9);
+	margin-left: -10px;
+	z-index: 1;
+}
+
+/* Add Card: logo dentro del input del número */
+app-add-card .pill-input--number {
+	position: relative;
+}
+
+app-add-card .pill-input--number.has-brand ion-input {
+	--padding-end: 64px;
+}
+
+app-add-card .pill-input--number .mdw-card-brand {
+	position: absolute;
+	right: 18px;
+	bottom: 18px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 24px;
+	pointer-events: none;
+}
+
+app-add-card .pill-input--number .mdw-card-brand .visa-text {
+	font-weight: 900;
+	font-style: italic;
+	letter-spacing: 0.5px;
+	color: var(--ion-text-color);
+}
+
+app-add-card .pill-input--number .mdw-card-brand .mastercard-circles {
+	display: flex;
+}
+
+app-add-card .pill-input--number .mdw-card-brand .mastercard-circles .circle {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+}
+
+app-add-card .pill-input--number .mdw-card-brand .mastercard-circles .circle.red {
+	background: rgba(235, 0, 27, 0.9);
+	z-index: 2;
+}
+
+app-add-card .pill-input--number .mdw-card-brand .mastercard-circles .circle.orange {
+	background: rgba(247, 158, 27, 0.9);
+	margin-left: -8px;
+	z-index: 1;
+}
+
 /* Ionic content scroll container lives inside shadow DOM */
 ion-content::part(scroll) {
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }
 
+/* Fullscreen Payment Simulator modal */
+ion-modal.mdw-payment-simulator-modal {
+	--height: 100%;
+	--width: 100%;
+	--max-height: 100%;
+	--max-width: 100%;
+	--border-radius: 0px;
+	--background: var(--ion-item-background);
+}
+
+ion-modal.mdw-payment-simulator-modal::part(content) {
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 0px;
+	box-shadow: none;
+	background: var(--ion-item-background);
+}
+
+/* Payment Simulator: styles moved global to avoid component style budget warnings */
+app-payment-simulator {
+	/* --- Match existing "profe" header style (see Add-Card) --- */
+	$dark-blue: #111e30;
+	$lime-green: #a2e232;
+
+	ion-header {
+		background: var(--ion-item-background);
+	}
+
+	ion-content {
+		--background: var(--ion-item-background);
+	}
+
+	.transparent-toolbar {
+		--background: transparent;
+		--color: #ffffff;
+		font-weight: 800;
+	}
+
+	.header-design {
+		position: relative;
+		padding-bottom: 22px;
+		background-color: #{$dark-blue};
+		border-bottom-left-radius: 40px;
+		border-bottom-right-radius: 40px;
+		overflow: hidden;
+
+		.header-text-container {
+			padding: 0 20px;
+			margin-top: 10px;
+		}
+
+		.subtitle {
+			font-size: 14px;
+			color: var(--ion-color-medium);
+			margin: 0;
+			font-weight: 700;
+		}
+	}
+
+	.mdw-back-btn {
+		--color: #ffffff;
+		--padding-start: 6px;
+		--padding-end: 6px;
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	.mdw-back-btn ion-icon {
+		font-size: 24px;
+	}
+
+	.mdw-content {
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* --- Confirm --- */
+	.mdw-confirm {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 18px 20px 0;
+	}
+
+	.mdw-confirm__stack {
+		width: 100%;
+		display: grid;
+		justify-items: center;
+		gap: 14px;
+	}
+
+	.mdw-confirm__merchant {
+		font-size: 24px;
+		font-weight: 900;
+		text-align: center;
+	}
+
+	.mdw-confirm__amount {
+		font-size: 34px;
+		font-weight: 900;
+		color: #{$lime-green};
+		text-align: center;
+	}
+
+	.mdw-confirm__card {
+		width: 100%;
+		max-width: 320px;
+	}
+
+	.mdw-confirm__nfc {
+		margin-top: 8px;
+		color: #{$lime-green};
+		display: grid;
+		place-items: center;
+	}
+
+	.mdw-confirm__nfc ion-icon {
+		font-size: 46px;
+		transform: rotate(90deg);
+	}
+
+	.mdw-confirm__hint {
+		margin: 0;
+		text-align: center;
+		color: var(--ion-color-medium);
+		font-weight: 700;
+		line-height: 1.35;
+	}
+
+	.mdw-confirm__footer {
+		margin-top: auto;
+		width: 100%;
+		padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+	}
+
+	.green-submit-btn {
+		--background: #{$lime-green};
+		--color: var(--ion-color-dark);
+		height: 54px;
+		font-weight: 900;
+		font-size: 16px;
+		--border-radius: 16px;
+	}
+
+	/* --- Processing + Success --- */
+	.mdw-processing,
+	.mdw-success {
+		flex: 1;
+		padding: 0 20px;
+		min-height: 70vh;
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: 10px;
+		text-align: center;
+	}
+
+	.mdw-processing__icon {
+		position: relative;
+		width: 96px;
+		height: 96px;
+		display: grid;
+		place-items: center;
+		color: #{$lime-green};
+	}
+
+	.mdw-processing__icon::after {
+		content: '';
+		position: absolute;
+		bottom: 10px;
+		width: 54px;
+		height: 20px;
+		border: 4px solid rgba($lime-green, 0.85);
+		border-top: 0;
+		border-radius: 0 0 999px 999px;
+		pointer-events: none;
+	}
+
+	.mdw-processing__icon ion-icon {
+		font-size: 62px;
+	}
+
+	.mdw-processing__title {
+		font-size: 22px;
+		font-weight: 900;
+	}
+
+	.mdw-processing__subtitle {
+		color: var(--ion-color-medium);
+		font-weight: 700;
+	}
+
+	.mdw-success__check {
+		width: 110px;
+		height: 110px;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		background: #{$lime-green};
+		color: var(--ion-color-dark);
+	}
+
+	.mdw-success__check ion-icon {
+		font-size: 54px;
+	}
+
+	.mdw-success__title {
+		font-size: 24px;
+		font-weight: 900;
+	}
+
+	.mdw-success__subtitle {
+		color: var(--ion-color-medium);
+		font-weight: 700;
+	}
+
+	.mdw-success__done {
+		margin-top: 10px;
+		font-weight: 900;
+		--color: #{$lime-green};
+	}
+}
+
 ion-content::part(scroll)::-webkit-scrollbar {
 	width: 0;
 	height: 0;
 	display: none;
+}
+
+/* Home quick-actions: improve tap reliability in some mobile emulators */
+app-home .quick-actions-grid {
+	position: relative;
+	z-index: 10;
+}
+
+/* Card component: Mastercard background (kept global to avoid component style budget warnings) */
+app-card .credit-card.mastercard {
+	background: linear-gradient(135deg, rgb(235, 0, 27), rgb(247, 158, 27));
+}
+
+app-card .credit-card .debit-label {
+	font-size: 0.75rem;
+	font-weight: 800;
+	letter-spacing: 1.2px;
+	opacity: 0.85;
+	margin-top: 6px;
+}
+
+/* Home (moved from home.page.scss to avoid component style budget warnings) */
+app-home .profile-avatar {
+	width: 38px;
+	height: 38px;
+	margin-right: 10px;
+	border: 2px solid var(--ion-border-color, rgba(0, 0, 0, 0.12));
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	background: #2b1f6b;
+}
+
+app-home .welcome-header {
+	margin-bottom: 30px;
+	color: var(--ion-text-color);
+}
+
+app-home .welcome-header h1 {
+	font-size: 2.2rem;
+	font-weight: 800;
+	margin-bottom: 4px;
+}
+
+app-home .welcome-header p {
+	color: var(--ion-color-medium);
+	margin: 0;
+	font-size: 1.1rem;
+}
+
+app-home .card-display-container {
+	min-height: 240px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: transparent;
+	border-radius: 0;
+	margin-bottom: 30px;
+}
+
+/* Home: stack de tarjetas (una detrás de otra) */
+app-home .mdw-card-stack {
+	position: relative;
+	align-self: flex-start;
+	width: 100%;
+	max-width: 340px;
+	height: 232px;
+	overflow: visible;
+}
+
+app-home .mdw-card-stack__item {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	transform-origin: top center;
+}
+
+app-home .card-display-container .no-cards-state {
+	text-align: center;
+}
+
+app-home .card-display-container .no-cards-state .placeholder-card-icon {
+	font-size: 80px;
+	color: var(--ion-color-medium);
+	margin-bottom: 10px;
+}
+
+app-home .card-display-container .no-cards-state p {
+	color: var(--ion-color-medium);
+	font-weight: 600;
+}
+
+app-home .card-display-container .no-cards-state ion-button {
+	--background: var(--ion-color-medium);
+	--color: var(--ion-color-medium-contrast);
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+app-home .quick-actions-grid {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 40px;
+}
+
+app-home .quick-actions-grid .action-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 30%;
+	background: transparent;
+	border: 0;
+	appearance: none;
+	-webkit-appearance: none;
+	font: inherit;
+	color: var(--ion-text-color);
+	cursor: pointer;
+	touch-action: manipulation;
+	position: relative;
+	overflow: hidden;
+	border-radius: 12px;
+	padding: 5px;
+}
+
+app-home .quick-actions-grid .action-item .icon-wrapper {
+	width: 65px;
+	height: 65px;
+	border-radius: 18px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+app-home .quick-actions-grid .action-item .icon-wrapper ion-icon {
+	font-size: 30px;
+	color: white;
+}
+
+app-home .quick-actions-grid .action-item .icon-wrapper.teal {
+	background: #1cd1c1;
+}
+
+app-home .quick-actions-grid .action-item .icon-wrapper.lime {
+	background: #b8e23c;
+}
+
+app-home .quick-actions-grid .action-item .icon-wrapper.dark {
+	background: #1a1e26;
+}
+
+app-home .quick-actions-grid .action-item span {
+	font-size: 0.85rem;
+	font-weight: 700;
+}
+
+app-home .history-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+	color: var(--ion-text-color);
+}
+
+app-home .history-header h2 {
+	font-weight: 800;
+	font-size: 1.4rem;
+	margin: 0;
+}
+
+app-home .history-header ion-note {
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+/* SkeletonLoading (global) */
+app-skeleton-loading {
+	display: block;
+}
+
+.mdw-skeleton-home {
+	display: grid;
+	gap: 16px;
+}
+
+.mdw-skeleton-card {
+	width: 100%;
+	padding: 16px;
+	border-radius: 22px;
+	background: var(--ion-item-background);
+}
+
+.mdw-skeleton-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.mdw-skeleton-row--top {
+	margin-bottom: 18px;
+}
+
+.mdw-skeleton-row--bottom {
+	margin-top: 14px;
+}
+
+.mdw-skeleton-pill {
+	width: 64px;
+	height: 14px;
+	border-radius: 999px;
+}
+
+.mdw-skeleton-brand {
+	width: 44px;
+	height: 18px;
+	border-radius: 6px;
+}
+
+.mdw-skeleton-line {
+	height: 14px;
+	border-radius: 8px;
+}
+
+.mdw-skeleton-line--hello {
+	width: 180px;
+}
+
+.mdw-skeleton-line--subtitle {
+	width: 220px;
+	height: 12px;
+}
+
+.mdw-skeleton-line--name {
+	width: 140px;
+	height: 12px;
+	margin-bottom: 10px;
+}
+
+.mdw-skeleton-line--number {
+	width: 240px;
+	height: 16px;
+}
+
+.mdw-skeleton-exp {
+	width: 56px;
+	height: 12px;
+	border-radius: 8px;
+}
+
+.mdw-skeleton-list {
+	background: transparent;
+}
+
+.mdw-skeleton-item {
+	--background: transparent;
+	--inner-padding-end: 0;
+	--padding-start: 0;
+}
+
+.mdw-skeleton-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.mdw-skeleton-line--title {
+	width: 160px;
+}
+
+.mdw-skeleton-line--date {
+	width: 110px;
+	height: 12px;
+	margin-top: 8px;
+}
+
+.mdw-skeleton-amount {
+	width: 64px;
+	height: 14px;
+	border-radius: 8px;
+}
+
+app-home .quick-actions-grid .action-item ion-icon,
+app-home .quick-actions-grid .action-item ion-ripple-effect {
+	pointer-events: none;
+}
+
+/* Change Card modal */
+ion-modal.mdw-change-card-modal {
+	--background: var(--ion-background-color, #ffffff);
+	--height: 100%;
+	--max-height: 100%;
+}
+
+ion-modal.mdw-change-card-modal::part(content) {
+	background: var(--ion-background-color, #ffffff);
+	height: 100vh;
+	height: 100lvh;
+}
+
+/* Total Expenses modal */
+ion-modal.mdw-total-expenses-modal {
+	--background: var(--ion-background-color, #ffffff);
+	--height: 100%;
+	--max-height: 100%;
+}
+
+ion-modal.mdw-total-expenses-modal::part(content) {
+	background: var(--ion-background-color, #ffffff);
+	height: 100vh;
+	height: 100lvh;
+}
+
+/* Reaction picker modal (bottom sheet) */
+ion-modal.mdw-reaction-picker-modal {
+	--background: var(--ion-background-color, #ffffff);
+}
+
+ion-modal.mdw-reaction-picker-modal::part(content) {
+	background: var(--ion-background-color, #ffffff);
+	border-top-left-radius: 18px;
+	border-top-right-radius: 18px;
+}
+
+/* Total Expenses modal content */
+app-total-expenses-modal .mdw-expenses__section-label {
+	margin: 0 0 10px;
+	color: var(--ion-color-medium);
+	font-weight: 700;
+	font-size: 0.9rem;
+}
+
+app-total-expenses-modal .mdw-expenses__account {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px;
+	border-radius: 16px;
+	background: var(--ion-item-background);
+}
+
+app-total-expenses-modal .mdw-expenses__account-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+app-total-expenses-modal .mdw-expenses__account-icon {
+	width: 44px;
+	height: 44px;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(var(--ion-text-color-rgb), 0.08);
+	color: var(--ion-text-color);
+}
+
+app-total-expenses-modal .mdw-expenses__account-icon ion-icon {
+	font-size: 24px;
+}
+
+app-total-expenses-modal .mdw-expenses__account-text {
+	min-width: 0;
+}
+
+app-total-expenses-modal .mdw-expenses__account-name {
+	font-weight: 800;
+	color: var(--ion-text-color);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+app-total-expenses-modal .mdw-expenses__account-last4 {
+	margin-top: 2px;
+	color: var(--ion-color-medium);
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+app-total-expenses-modal .mdw-expenses__account-select {
+	--padding-start: 10px;
+	--padding-end: 10px;
+	--placeholder-color: var(--ion-text-color);
+	--placeholder-opacity: 0.8;
+	font-weight: 800;
+	color: var(--ion-text-color);
+}
+
+app-total-expenses-modal .mdw-expenses__total-label {
+	margin: 18px 0 6px;
+	text-align: center;
+	color: var(--ion-color-medium);
+	font-weight: 700;
+}
+
+app-total-expenses-modal .mdw-expenses__total-amount {
+	text-align: center;
+	font-size: 2.3rem;
+	font-weight: 900;
+	color: var(--ion-color-success);
+	margin-bottom: 16px;
+}
+
+app-total-expenses-modal .mdw-expenses__month-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 6px 0 10px;
+}
+
+app-total-expenses-modal .mdw-expenses__month-label {
+	font-weight: 900;
+	color: var(--ion-text-color);
+	text-transform: lowercase;
+}
+
+app-total-expenses-modal .mdw-expenses__month-nav {
+	display: flex;
+	align-items: center;
+}
+
+app-total-expenses-modal .mdw-expenses__calendar {
+	padding: 12px;
+	border-radius: 16px;
+	background: var(--ion-item-background);
+}
+
+app-total-expenses-modal .mdw-expenses__dow {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 6px;
+	margin-bottom: 8px;
+	color: var(--ion-color-medium);
+	font-weight: 800;
+	font-size: 0.85rem;
+	text-align: center;
+}
+
+app-total-expenses-modal .mdw-expenses__grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 6px;
+}
+
+app-total-expenses-modal .mdw-expenses__day {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--ion-text-color);
+	font-weight: 800;
+	cursor: pointer;
+}
+
+app-total-expenses-modal .mdw-expenses__day.is-empty {
+	cursor: default;
+}
+
+app-total-expenses-modal .mdw-expenses__day.has-tx {
+	box-shadow: inset 0 0 0 2px rgba(var(--ion-color-success-rgb), 0.35);
+}
+
+app-total-expenses-modal .mdw-expenses__day.is-selected {
+	background: var(--ion-color-success);
+	color: var(--ion-color-success-contrast);
+	box-shadow: none;
+}
+
+app-total-expenses-modal .mdw-expenses__list {
+	margin-top: 14px;
+}
+
+app-total-expenses-modal .mdw-expenses__hint {
+	margin: 14px 0 0;
+	text-align: center;
+	color: var(--ion-color-medium);
+	font-weight: 600;
+	font-size: 0.85rem;
+}
+
+app-change-card-modal ion-content {
+	--background: var(--ion-background-color, #ffffff);
+	--color: var(--ion-text-color);
+	--keyboard-offset: 0px !important;
+}
+
+app-change-card-modal ion-toolbar {
+	--background: transparent;
+	--color: var(--ion-text-color);
+}
+
+app-change-card-modal .mdw-change-card {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 8px 16px calc(16px + env(safe-area-inset-bottom));
+}
+
+app-change-card-modal .mdw-change-card__carousel {
+	flex: 1;
+	display: flex;
+	align-items: center;
+}
+
+app-change-card-modal .mdw-change-card__viewport {
+	width: 100%;
+	overflow: hidden;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: pan-y;
+}
+
+app-change-card-modal .mdw-change-card__track {
+	display: flex;
+	gap: 16px;
+	will-change: transform;
+	transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+app-change-card-modal .mdw-change-card__track.is-dragging,
+app-change-card-modal .mdw-change-card__track.no-transition {
+	transition: none;
+}
+
+/* Evita el “brinco” visual cuando recentramos el loop (cambia de copia) */
+app-change-card-modal .mdw-change-card__track.no-transition .mdw-change-card-slide {
+	transition: none !important;
+}
+
+app-change-card-modal .mdw-change-card-slide {
+	flex: 0 0 auto;
+	width: min(340px, 82vw);
+	opacity: 0.85;
+	transform: scale(0.94);
+	transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+app-change-card-modal .mdw-change-card-slide.is-active {
+	opacity: 1;
+	transform: scale(1);
+}
+
+app-change-card-modal .mdw-change-card-slide app-card .credit-card {
+	margin: 0;
+}
+
+app-change-card-modal .mdw-change-card__meta {
+	text-align: center;
+	margin-top: 16px;
+	margin-bottom: 18px;
+}
+
+app-change-card-modal .mdw-change-card__name {
+	font-size: 1.15rem;
+	font-weight: 800;
+	color: var(--ion-text-color);
+}
+
+app-change-card-modal .mdw-change-card__sub {
+	margin-top: 6px;
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--ion-color-medium);
+}
+
+app-change-card-modal .mdw-set-default-btn {
+	--background: var(--ion-color-light);
+	--color: var(--ion-color-light-contrast);
+	--border-radius: 999px;
+	--box-shadow: none;
+	font-weight: 800;
+	text-transform: none;
+}
+
+app-change-card-modal .mdw-set-default-btn ion-icon {
+	color: var(--ion-color-success);
+}
+
+app-change-card-modal .mdw-change-card__empty {
+	min-height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	color: var(--ion-color-medium);
+}
+
+/* Profile modal (sheet) */
+ion-modal.mdw-profile-modal {
+	--background: var(--ion-background-color, #ffffff);
+	--height: 100%;
+	--max-height: 100%;
+}
+
+ion-modal.mdw-profile-modal::part(content) {
+	border-radius: 28px 28px 0 0;
+	background: var(--ion-background-color, #ffffff);
+	height: 100vh;
+	height: 100lvh;
+}
+
+ion-modal.mdw-profile-modal::part(handle) {
+	background: var(--ion-color-medium);
+}
+
+app-profile-modal ion-content {
+	--background: var(--ion-background-color, #ffffff);
+	--color: var(--ion-text-color);
+	--keyboard-offset: 0px !important;
+}
+
+app-profile-modal .mdw-profile-toolbar {
+	--background: var(--ion-background-color, #ffffff);
+	--color: var(--ion-text-color);
+}
+
+app-profile-modal ion-header {
+	--background: var(--ion-background-color, #ffffff);
+	background: var(--ion-background-color, #ffffff);
+}
+
+app-profile-modal ion-title {
+	color: var(--ion-text-color);
+	font-weight: 800;
+}
+
+app-profile-modal ion-toolbar ion-button {
+	--color: var(--ion-text-color);
+}
+
+app-profile-modal .mdw-profile {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 10px 18px 18px;
+}
+
+app-profile-modal .mdw-profile-avatar {
+	display: flex;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+app-profile-modal .mdw-avatar-ring {
+	position: relative;
+	width: 110px;
+	height: 110px;
+	border-radius: 999px;
+	padding: 6px;
+	background: #a2e232;
+}
+
+app-profile-modal .mdw-avatar-img {
+	width: 100%;
+	height: 100%;
+	border-radius: 999px;
+	display: block;
+	background: var(--ion-item-background, #ffffff);
+}
+
+app-profile-modal .mdw-avatar-camera {
+	position: absolute;
+	right: -2px;
+	bottom: -2px;
+	width: 34px;
+	height: 34px;
+	border-radius: 999px;
+	border: 3px solid var(--ion-background-color);
+	background: #a2e232;
+	color: var(--ion-color-dark);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+app-profile-modal .mdw-profile-name {
+	text-align: center;
+	margin: 10px 0 4px;
+	font-weight: 800;
+	color: var(--ion-text-color);
+}
+
+app-profile-modal .mdw-profile-subtitle {
+	text-align: center;
+	margin: 0 0 14px;
+	color: var(--ion-color-medium);
+}
+
+app-profile-modal .mdw-profile-list {
+	background: transparent;
+}
+
+app-profile-modal .mdw-profile-item {
+	--background: var(--ion-item-background, #ffffff);
+	--color: var(--ion-text-color);
+	--inner-padding-end: 10px;
+	--padding-start: 10px;
+	border: 1px solid var(--ion-border-color, rgba(0, 0, 0, 0.12));
+	border-radius: 16px;
+	margin: 0 0 12px;
+}
+
+app-profile-modal .mdw-profile-item ion-label {
+	color: var(--ion-color-medium);
+	font-weight: 700;
+}
+
+app-profile-modal .mdw-profile-item ion-input {
+	--color: var(--ion-text-color);
+	--placeholder-color: var(--ion-color-medium);
+}
+
+app-profile-modal .mdw-profile-item ion-icon {
+	color: var(--ion-color-medium);
+}
+
+app-profile-modal .mdw-profile-actions {
+	margin-top: 16px;
+	padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+}
+
+/* Profile modal: compacta en ventanas bajas (sin scroll) */
+@media (max-height: 760px) {
+	app-profile-modal .mdw-profile {
+		padding: 8px 18px 14px;
+	}
+
+	app-profile-modal .mdw-avatar-ring {
+		width: 96px;
+		height: 96px;
+	}
+
+	app-profile-modal .mdw-profile-item {
+		margin: 0 0 10px;
+	}
+}
+
+app-profile-modal ion-footer.mdw-profile-footer {
+	--background: var(--ion-background-color);
+	background: var(--ion-background-color);
+}
+
+app-profile-modal .mdw-profile-save {
+	--background: #a2e232;
+	--color: var(--ion-color-dark);
+	height: 54px;
+	font-weight: 800;
+	--border-radius: 16px;
+	margin-bottom: 12px;
 }

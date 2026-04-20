@@ -7,17 +7,29 @@
 
   <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
 
-    <ion-input label="Correo Electrónico" labelPlacement="floating" fill="solid" type="email" formControlName="email"
-      class="ion-margin-bottom"></ion-input>
+    <app-custom-input
+      class="ion-margin-bottom"
+      label="Correo Electrónico"
+      type="email"
+      placeholder="correo@ejemplo.com"
+      autocomplete="email"
+      formControlName="email">
+    </app-custom-input>
 
-    <ion-input label="Contraseña" labelPlacement="floating" fill="solid" type="password" formControlName="password"
-      class="ion-margin-bottom"></ion-input>
+    <app-custom-input
+      class="ion-margin-bottom"
+      label="Contraseña"
+      type="password"
+      placeholder="••••••••"
+      autocomplete="current-password"
+      formControlName="password">
+    </app-custom-input>
 
     <ion-button expand="block" type="submit" [disabled]="!loginForm.valid" class="ion-margin-top">
       Iniciar Sesión
     </ion-button>
 
-    <ion-button expand="block" fill="outline" color="dark" (click)="loginWithGoogle()" class="ion-margin-top">
+    <ion-button expand="block" type="button" fill="outline" color="dark" (click)="loginWithGoogle()" class="ion-margin-top">
       <ion-icon name="logo-google" slot="start"></ion-icon>
       Continuar con Google
     </ion-button>

@@ -1,13 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 
-import { User } from './user';
+import { FirestoreService } from './firestore';
+import { UserService } from './user';
 
-describe('User', () => {
-  let service: User;
+describe('UserService', () => {
+  let service: UserService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(User);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: FirestoreService,
+          useValue: {
+            getDoc: async () => null,
+            setDoc: async () => { }
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(UserService);
   });
 
   it('should be created', () => {

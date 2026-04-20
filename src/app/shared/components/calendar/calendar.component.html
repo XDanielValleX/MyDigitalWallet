@@ -1,3 +1,19 @@
-<p>
-  calendar works!
-</p>
+<div class="mdw-expenses__calendar">
+  <div class="mdw-expenses__dow">
+    <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+  </div>
+
+  <div class="mdw-expenses__grid">
+    <button
+      type="button"
+      class="mdw-expenses__day"
+      *ngFor="let cell of cells"
+      [class.is-empty]="!cell.day"
+      [class.has-tx]="cell.hasTx"
+      [class.is-selected]="cell.day && selectedDay === cell.day"
+      [disabled]="!cell.day"
+      (click)="cell.day && selectDay(cell.day)">
+      {{ cell.day || '' }}
+    </button>
+  </div>
+</div>

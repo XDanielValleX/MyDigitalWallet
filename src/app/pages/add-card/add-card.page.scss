@@ -1,0 +1,138 @@
+/* --- Variables locales para colores --- */
+$dark-blue: #111e30;
+$lime-green: #a2e232;
+
+
+/* --- Configuración del Content y Fondo --- */
+ion-content {
+    --background: var(--ion-background-color);
+}
+
+/* --- Transparencia del Toolbar nativo --- */
+.transparent-toolbar {
+    --background: transparent;
+    --color: #ffffff; // Texto del título blanco
+    font-weight: bold;
+}
+
+/* --- Diseño Visual del Header Oscuro y Curvo --- */
+.header-design {
+    position: relative;
+    padding-bottom: 22px;
+    background-color: #{$dark-blue}; // Fondo azul oscuro
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    overflow: hidden;
+
+    .header-text-container {
+        padding: 0 20px;
+        margin-top: 10px;
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--ion-color-medium);
+            margin: 0;
+        }
+    }
+}
+
+/* --- Contenedor Principal y Tarjeta --- */
+.main-content {
+	padding: 18px 20px 0;
+}
+
+.card-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+/* --- Tarjeta Preview (como el profe) --- */
+.preview-card {
+    width: 100%;
+    max-width: 340px;
+    height: 170px;
+    border-radius: 20px;
+    padding: 22px;
+    background: linear-gradient(135deg, #2d3446, #1a1e26);
+    color: #fff;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-weight: 800;
+
+    .preview-card-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+    }
+
+    .preview-card-holder {
+        font-size: 0.85rem;
+    }
+
+    .preview-card-number {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1.05rem;
+    }
+
+    .preview-card-exp {
+        align-self: flex-end;
+        font-weight: 900;
+        font-size: 0.9rem;
+    }
+}
+
+/* --- Estilos del Formulario y los Inputs --- */
+.form-container {
+    ion-list {
+        background: transparent;
+        padding: 0;
+    }
+}
+
+.pill-input {
+    --background: transparent; // Fondo transparente para que el input destaque
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    margin-bottom: 20px;
+
+    ion-label {
+        font-size: 12px;
+        font-weight: bold;
+        color: var(--ion-color-medium);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase; // Forzar mayúsculas en el label
+    }
+
+    ion-input {
+        --background: var(--ion-item-background);
+		--color: var(--ion-text-color);
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --padding-top: 14px;
+        --padding-bottom: 14px;
+        --border-radius: 16px; // Bordes muy redondeados
+        font-size: 16px;
+        font-weight: 500;
+        border: 1px solid var(--ion-border-color);
+    }
+}
+
+.footer-btn-container {
+	padding: 10px 20px;
+}
+
+.green-submit-btn {
+    --background: #{$lime-green}; // Verde lima vibrante
+	--color: var(--ion-color-dark);
+    height: 54px;
+    font-weight: bold;
+    font-size: 16px;
+    --border-radius: 16px; // Botón redondeado
+}

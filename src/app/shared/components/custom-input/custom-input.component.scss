@@ -1,0 +1,54 @@
+/* CustomInput styles */
+.mdw-custom-input {
+	display: block;
+}
+
+.mdw-custom-input__item {
+	--background: transparent;
+	--padding-start: 0;
+	--padding-end: 0;
+	--inner-padding-end: 0;
+	--min-height: auto;
+	margin-bottom: 8px;
+
+	ion-label {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--ion-color-medium);
+		margin-bottom: 8px;
+		letter-spacing: 0.5px;
+		text-transform: uppercase;
+	}
+
+	ion-input {
+		--background: var(--ion-item-background);
+		--color: var(--ion-text-color);
+		--padding-start: 16px;
+		--padding-end: 16px;
+		--padding-top: 14px;
+		--padding-bottom: 14px;
+		--border-radius: 16px;
+		font-size: 16px;
+		font-weight: 500;
+		border: 1px solid var(--ion-border-color);
+		border-radius: 16px;
+		overflow: hidden;
+	}
+}
+
+.mdw-custom-input__item--invalid {
+	ion-label {
+		color: var(--ion-color-danger);
+	}
+
+	ion-input {
+		border-color: var(--ion-color-danger);
+	}
+}
+
+.mdw-custom-input__error {
+	display: block;
+	margin: 4px 0 12px;
+	font-size: 12px;
+	font-weight: 600;
+}

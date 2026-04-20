@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, runInInjectionContext } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
@@ -8,15 +8,15 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private auth: Auth, private router: Router) { }
+  constructor(private auth: Auth, private router: Router, private injector: Injector) { }
 
   canActivate(): Observable<boolean> {
-    return authState(this.auth).pipe(
+    return runInInjectionContext(this.injector, () => authState(this.auth)).pipe(
       map(user => {
         if (user) {
           return true; // El usuario tiene sesión, lo dejamos pasar
         } else {
-          this.router.navigate(['/login']); // No hay sesión, pa' fuera
+          void this.router.navigate(['/login']).catch(() => window.location.assign('/login')); // No hay sesión, pa' fuera
           return false;
         }
       })

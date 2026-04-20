@@ -1,24 +1,14 @@
-<ion-grid>
-  <ion-row class="ion-text-center">
-    <ion-col>
-      <ion-button expand="block" fill="outline" shape="round" color="light">
-        <ion-icon slot="start" name="swap-horizontal-outline"></ion-icon>
-        Transferir
-      </ion-button>
-    </ion-col>
-    <ion-col>
-      <ion-button expand="block" fill="outline" shape="round" color="light">
-        <ion-icon slot="start" name="cash-outline"></ion-icon>
-        Recargar
-      </ion-button>
-    </ion-col>
-  </ion-row>
-  <ion-row class="ion-text-center">
-    <ion-col>
-      <ion-button expand="block" fill="solid" shape="round" color="primary">
-        <ion-icon slot="start" name="card-outline"></ion-icon>
-        Pagar
-      </ion-button>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+<div class="quick-actions-grid">
+  <button
+    *ngFor="let a of actions"
+    type="button"
+    class="action-item ion-activatable"
+    (click)="onAction(a.id)"
+    (pointerup)="onAction(a.id)">
+    <div class="icon-wrapper" [ngClass]="a.tone">
+      <ion-icon [name]="a.icon"></ion-icon>
+    </div>
+    <span>{{ a.label }}</span>
+    <ion-ripple-effect></ion-ripple-effect>
+  </button>
+</div>

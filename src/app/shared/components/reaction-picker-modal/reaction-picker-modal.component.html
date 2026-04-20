@@ -1,0 +1,17 @@
+<ion-content>
+    <div class="mdw-reaction-picker ion-padding">
+        <div class="mdw-reaction-picker__title">{{ title }}</div>
+
+        <emoji-mart
+            [darkMode]="isDark"
+            [set]="'apple'"
+            [isNative]="true"
+            [showPreview]="false"
+            [enableSearch]="true"
+            [emojiTooltip]="true"
+            [perLine]="8"
+            [emojiSize]="24"
+            (emojiSelect)="onEmojiSelect($event)">
+        </emoji-mart>
+    </div>
+</ion-content>

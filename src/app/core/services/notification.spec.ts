@@ -1,13 +1,32 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Notification } from './notification';
+import { DialogService } from './dialog';
+import { ToastService } from './toast';
+import { NotificationService } from './notification';
 
-describe('Notification', () => {
-  let service: Notification;
+describe('NotificationService', () => {
+  let service: NotificationService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Notification);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ToastService,
+          useValue: {
+            show: async () => { },
+            success: async () => { },
+            error: async () => { }
+          }
+        },
+        {
+          provide: DialogService,
+          useValue: {
+            confirm: async () => true
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(NotificationService);
   });
 
   it('should be created', () => {

@@ -1,13 +1,27 @@
 import { TestBed } from '@angular/core/testing';
+import { LoadingController } from '@ionic/angular';
 
-import { Loading } from './loading';
+import { LoadingService } from './loading';
 
-describe('Loading', () => {
-  let service: Loading;
+describe('LoadingService', () => {
+  let service: LoadingService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Loading);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: LoadingController,
+          useValue: {
+            create: async () => ({
+              present: async () => { },
+              dismiss: async () => { },
+              onDidDismiss: async () => ({})
+            })
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(LoadingService);
   });
 
   it('should be created', () => {
