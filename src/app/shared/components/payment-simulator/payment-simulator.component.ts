@@ -273,17 +273,29 @@ export class PaymentSimulatorComponent {
   private async sendPushConfirmation(uid: string): Promise<void> {
     const token = await this.users.ensurePushToken(uid);
     if (!token) {
+      await this.notify.info('No se pudo obtener el token de notificaciones (permiso denegado o no disponible).');
       return;
     }
 
-    await this.http.sendPushNotificationIfConfigured({
-      token,
-      title: 'Payment Successful',
-      body: `You have successfully paid an amount of ${this.amountLabel}.`,
-      data: {
-        merchant: this.merchant,
-        amount: String(this.amount)
-      }
-    });
+    let sent = false;
+    try {
+      sent = await this.http.sendPushNotificationIfConfigured({
+        token,
+        title: 'Payment Successful',
+        body: `You have successfully paid an amount of ${this.amountLabel}.`,
+        data: {
+          merchant: this.merchant,
+          amount: String(this.amount)
+        }
+      });
+    } catch (err) {
+      console.warn('Push notification failed:', err);
+      await this.notify.error('No se pudo enviar la notificación push.');
+      return;
+    }
+
+    if (!sent) {
+      await this.notify.info('Push no configurado: inicia sesión en el servicio de Railway (ver README) para poder enviarlas.');
+    }
   }
 }

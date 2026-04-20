@@ -36,6 +36,8 @@ export class AuthService {
         provider: 'google',
         options: {
           scopes: ['email', 'profile'],
+          // Android may cache stale tokens; force a fresh token to avoid invalid credential issues.
+          forceRefreshToken: true,
         },
       });
 
@@ -79,6 +81,7 @@ export class AuthService {
     this.socialLoginInitPromise = SocialLogin.initialize({
       google: {
         webClientId,
+        mode: 'online',
       },
     });
 

@@ -39,7 +39,7 @@ Tras la revisión del proyecto, se han consolidado las siguientes reglas de nego
 - **Autorización de Pagos**: Si el perfil tiene habilitada la biometría, cada pago requerirá una validación de identidad (Biometría o PIN del dispositivo) antes de procesarse.
 - **Simulación de Datos**: Uso de `faker.js` para generar comercios y montos realistas en la interfaz de simulación de pagos.
 - **Trazabilidad**: Registro detallado en Firestore por transacción (cardId, merchant, amount, date) para permitir el filtrado histórico por tarjeta.
-- **Personalización con Emojis**: Los usuarios pueden asignar y reaccionar a sus gastos mediante Emojis utilizando una **pulsación larga de 2 segundos** sobre cualquier item del historial, integrando la librería `@ctrl/ngx-emoji-mart`.
+- **Personalización con Emojis**: Los usuarios pueden asignar y reaccionar a sus gastos mediante Emojis con un **tap/click** sobre cualquier item del historial, integrando la librería `@ctrl/ngx-emoji-mart`.
 - **Búsqueda por Fecha**: Filtrado dinámico de transacciones por día específico mediante el uso del **CalendarComponent**, facilitando el control de gastos diarios.
 - **Notificaciones**: Envío de confirmación mediante notificaciones push nativas al concluir transacciones exitosas.
 
