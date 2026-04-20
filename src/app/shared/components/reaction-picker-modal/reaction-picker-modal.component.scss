@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+.mdw-reaction-picker {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mdw-reaction-picker__title {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin: 8px 0 14px;
+  color: var(--ion-text-color);
+}
+
+emoji-mart {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .emoji-mart {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 14px;
+}
+
+:host ::ng-deep .emoji-mart,
+:host ::ng-deep .emoji-mart * {
+  max-width: 100%;
+}

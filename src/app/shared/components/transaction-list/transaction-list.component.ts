@@ -1,4 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+export type TransactionListItem = {
+  id?: string | number;
+  title: string;
+  date: string;
+  amount: number;
+  type: 'expense' | 'income';
+  icon: string;
+  reaction?: string | null;
+};
 
 @Component({
   selector: 'app-transaction-list',
@@ -7,10 +17,11 @@ import { Component } from '@angular/core';
   standalone: false
 })
 export class TransactionListComponent {
-  // Datos de prueba para maquetar la interfaz
-  transactions = [
-    { id: 1, title: 'Netflix', date: '19 Abr 2026', amount: 35000, type: 'expense', icon: 'tv-outline' },
-    { id: 2, title: 'Transferencia recibida', date: '18 Abr 2026', amount: 150000, type: 'income', icon: 'arrow-down-outline' },
-    { id: 3, title: 'Supermercado', date: '17 Abr 2026', amount: 85000, type: 'expense', icon: 'cart-outline' }
-  ];
+  @Input() transactions: TransactionListItem[] = [];
+
+  /** Enables long-press reactions on items (used in View All / Total Expenses). */
+  @Input() enableReactions = false;
+
+  /** Emits when the user long-presses an item to add/change a reaction. */
+  @Output() reactionRequested = new EventEmitter<TransactionListItem>();
 }

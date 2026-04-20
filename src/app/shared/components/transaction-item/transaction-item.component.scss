@@ -25,8 +25,8 @@
 
         /* Estilo para gastos (rojo/gris) */
         &.expense {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+			background: rgba(var(--ion-text-color-rgb), 0.08);
+			color: var(--ion-text-color);
         }
     }
 
@@ -39,7 +39,7 @@
         }
 
         &.expense {
-            color: #ffffff;
+			color: var(--ion-text-color);
         }
     }
 
@@ -50,6 +50,17 @@
     }
 
     p {
-        color: #a0a0a0;
+		color: var(--ion-color-medium);
+    }
+
+    .end-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .reaction {
+        font-size: 1.2rem;
+        line-height: 1;
     }
 }

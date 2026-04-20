@@ -1,13 +1,77 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>payment</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <div class="header-design">
+    <ion-toolbar class="transparent-toolbar">
+      <ion-buttons slot="start">
+        <ion-button class="mdw-back-btn" fill="clear" type="button" (click)="backToHome()" (pointerup)="backToHome()">
+          <ion-icon slot="icon-only" [icon]="backIcon"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+
+      <ion-title>Confirm Payment</ion-title>
+    </ion-toolbar>
+
+    <div class="header-text-container">
+      <p class="subtitle">Secure NFC Transaction</p>
+    </div>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">payment</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [scrollY]="false">
+  <ng-container *ngIf="isLoading; else loaded">
+    <div class="mdw-content mdw-loading">
+      <app-skeleton-loading variant="card"></app-skeleton-loading>
+    </div>
+  </ng-container>
+
+  <ng-template #loaded>
+    <ng-container *ngIf="card; else noCard">
+      <div class="mdw-content">
+        <div class="mdw-confirm">
+          <div class="mdw-confirm__stack">
+            <div class="mdw-confirm__merchant">{{ merchant }}</div>
+            <div class="mdw-confirm__amount">{{ amount | currency:'USD':'symbol':'1.2-2' }}</div>
+
+            <div class="mdw-confirm__card">
+              <app-card
+                [cardNumber]="card.cardNumber"
+                [cardHolder]="card.cardHolder"
+                [expDate]="card.expDate"
+                [isActive]="true">
+              </app-card>
+            </div>
+
+            <div class="mdw-confirm__nfc" aria-hidden="true">
+              <ion-icon name="wifi-outline"></ion-icon>
+            </div>
+
+            <p class="mdw-confirm__hint">
+              Ready to transmit your payment securely over NFC.<br />
+              Hold your phone near the reader.
+            </p>
+          </div>
+
+          <div class="mdw-confirm__footer">
+            <ion-button
+              expand="block"
+              shape="round"
+              class="green-submit-btn"
+              (click)="confirmPayment()"
+              (pointerup)="confirmPayment()"
+              [disabled]="simulatorOpen">
+              CONFIRM PAYMENT
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noCard>
+      <div class="mdw-empty ion-text-center">
+        <p>No cards available.</p>
+        <ion-button expand="block" shape="round" (click)="goAddCard()" (pointerup)="goAddCard()">
+          + Add Card
+        </ion-button>
+      </div>
+    </ng-template>
+  </ng-template>
 </ion-content>

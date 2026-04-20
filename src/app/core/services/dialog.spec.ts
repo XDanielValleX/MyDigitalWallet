@@ -1,13 +1,26 @@
 import { TestBed } from '@angular/core/testing';
+import { AlertController } from '@ionic/angular';
 
-import { Dialog } from './dialog';
+import { DialogService } from './dialog';
 
-describe('Dialog', () => {
-  let service: Dialog;
+describe('DialogService', () => {
+  let service: DialogService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Dialog);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: AlertController,
+          useValue: {
+            create: async () => ({
+              present: async () => { },
+              onDidDismiss: async () => ({ role: 'ok' })
+            })
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(DialogService);
   });
 
   it('should be created', () => {

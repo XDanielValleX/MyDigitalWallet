@@ -1,3 +1,84 @@
-<p>
-  payment-simulator works!
-</p>
+<ion-header class="ion-no-border">
+  <div class="header-design">
+    <ion-toolbar class="transparent-toolbar">
+      <ion-buttons slot="start">
+        <ion-button
+          class="mdw-back-btn"
+          fill="clear"
+          type="button"
+          (click)="back()"
+          (pointerup)="back()">
+          <ion-icon slot="icon-only" [icon]="backIcon"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+
+      <ion-title>Confirm Payment</ion-title>
+    </ion-toolbar>
+
+    <div class="header-text-container">
+      <p class="subtitle">Secure NFC Transaction</p>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content [scrollY]="false">
+  <div class="mdw-content">
+    <ng-container [ngSwitch]="step">
+      <div *ngSwitchCase="'confirm'" class="mdw-confirm">
+        <div class="mdw-confirm__stack">
+          <div class="mdw-confirm__merchant">{{ merchant }}</div>
+          <div class="mdw-confirm__amount">{{ amount | currency:'USD':'symbol':'1.2-2' }}</div>
+
+          <div class="mdw-confirm__card">
+            <app-card
+              [cardNumber]="card?.cardNumber"
+              [cardHolder]="card?.cardHolder"
+              [expDate]="card?.expDate"
+              [isActive]="true">
+            </app-card>
+          </div>
+
+          <div class="mdw-confirm__nfc" aria-hidden="true">
+            <ion-icon name="wifi-outline"></ion-icon>
+          </div>
+
+          <p class="mdw-confirm__hint">
+            Ready to transmit your payment securely over NFC.<br />
+            Hold your phone near the reader.
+          </p>
+        </div>
+
+        <div class="mdw-confirm__footer">
+          <ion-button
+            expand="block"
+            shape="round"
+            class="green-submit-btn"
+            (click)="confirmPayment()"
+            (pointerup)="confirmPayment()">
+            CONFIRM PAYMENT
+          </ion-button>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'processing'" class="mdw-processing">
+        <div class="mdw-processing__icon" aria-hidden="true">
+          <ion-icon name="phone-portrait-outline"></ion-icon>
+        </div>
+        <div class="mdw-processing__title">Processing...</div>
+        <div class="mdw-processing__subtitle">Hold your phone near the reader</div>
+      </div>
+
+      <div *ngSwitchCase="'success'" class="mdw-success">
+        <div class="mdw-success__check" aria-hidden="true">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </div>
+        <div class="mdw-success__title">Payment Sent!</div>
+        <div class="mdw-success__subtitle">{{ amount | currency:'USD':'symbol':'1.2-2' }} to {{ merchant }}</div>
+
+        <ion-button fill="clear" (click)="done()" (pointerup)="done()" class="mdw-success__done">
+          DONE
+        </ion-button>
+      </div>
+    </ng-container>
+  </div>
+</ion-content>

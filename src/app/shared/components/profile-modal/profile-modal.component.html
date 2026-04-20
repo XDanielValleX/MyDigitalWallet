@@ -1,0 +1,85 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="mdw-profile-toolbar">
+    <ion-title>My Profile</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" type="button" (click)="close()">
+        <ion-icon slot="icon-only" [icon]="closeIcon"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false">
+  <div class="mdw-profile" [class.is-loading]="isLoading">
+    <div class="mdw-profile-avatar">
+      <div class="mdw-avatar-ring">
+        <img src="/assets/avatar-placeholder.svg" alt="Profile" class="mdw-avatar-img" />
+        <button type="button" class="mdw-avatar-camera" aria-label="Change photo">
+          <ion-icon [icon]="cameraIcon"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <h2 class="mdw-profile-name">{{ fullName }}</h2>
+    <p class="mdw-profile-subtitle">App VIP Member</p>
+
+    <ion-list class="mdw-profile-list" lines="none">
+      <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="personIcon" aria-hidden="true"></ion-icon>
+        <ion-label position="stacked">First Name</ion-label>
+        <ion-input type="text" [(ngModel)]="firstName" placeholder="First Name"></ion-input>
+      </ion-item>
+
+      <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="personIcon" aria-hidden="true"></ion-icon>
+        <ion-label position="stacked">Last Name</ion-label>
+        <ion-input type="text" [(ngModel)]="lastName" placeholder="Last Name"></ion-input>
+      </ion-item>
+
+      <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="fingerIcon" aria-hidden="true"></ion-icon>
+        <ion-label>Biometrics</ion-label>
+        <ion-toggle
+          slot="end"
+          color="success"
+          [(ngModel)]="biometricsEnabled"
+          (ionChange)="onBiometricsToggle($event)"
+          [disabled]="isLoading || isSaving || isUpdatingBiometrics"></ion-toggle>
+      </ion-item>
+
+      <ion-item class="mdw-profile-item" lines="none">
+        <ion-icon slot="start" [icon]="moonIcon" aria-hidden="true"></ion-icon>
+        <ion-label>Dark Mode</ion-label>
+        <ion-toggle
+          slot="end"
+          color="success"
+          [checked]="darkMode"
+          (ionChange)="onDarkModeChanged($event)"></ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <div class="mdw-profile-actions">
+      <ion-button
+        expand="block"
+        shape="round"
+        class="mdw-profile-save"
+        type="button"
+        (click)="saveChanges()"
+        [disabled]="isSaving || isUpdatingBiometrics">
+        {{ isSaving ? 'SAVING...' : 'SAVE CHANGES' }}
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        shape="round"
+        fill="outline"
+        color="danger"
+        type="button"
+        (click)="logout()">
+        <ion-icon slot="start" [icon]="logoutIcon"></ion-icon>
+        LOGOUT
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

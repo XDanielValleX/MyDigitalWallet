@@ -1,0 +1,63 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar>
+        <ion-title>Total Expenses</ion-title>
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="close()">CLOSE</ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="mdw-expenses ion-padding">
+        <p class="mdw-expenses__section-label">Choose Account</p>
+
+        <div class="mdw-expenses__account">
+            <div class="mdw-expenses__account-left">
+                <div class="mdw-expenses__account-icon">
+                    <ion-icon name="logo-apple"></ion-icon>
+                </div>
+
+                <div class="mdw-expenses__account-text">
+                    <div class="mdw-expenses__account-name">{{ activeCard?.cardHolder || 'User' }}</div>
+                    <div class="mdw-expenses__account-last4">•••• •••• •••• {{ last4(activeCard?.cardNumber) }}</div>
+                </div>
+            </div>
+
+            <ion-select class="mdw-expenses__account-select" interface="popover" [value]="activeCardId"
+                [selectedText]="'Change'" toggleIcon="chevron-down" (ionChange)="onCardChange($event)">
+                <ion-select-option *ngFor="let c of cards" [value]="c.id">
+                    {{ (c.cardHolder || 'Card') }} •••• {{ last4(c.cardNumber) }}
+                </ion-select-option>
+            </ion-select>
+        </div>
+
+        <p class="mdw-expenses__total-label">Total Spend (By Card)</p>
+        <div class="mdw-expenses__total-amount">{{ totalSpent | currency:'USD':'symbol':'1.2-2' }}</div>
+
+        <div class="mdw-expenses__month-row">
+            <div class="mdw-expenses__month-label">{{ monthLabel }}</div>
+            <div class="mdw-expenses__month-nav">
+                <ion-button fill="clear" size="small" (click)="prevMonth()" aria-label="Previous month">
+                    <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" size="small" (click)="nextMonth()" aria-label="Next month">
+                    <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
+                </ion-button>
+            </div>
+        </div>
+
+        <app-calendar [year]="year" [month]="month" [daysWithTx]="daysWithTx" [selectedDay]="selectedDay"
+            (selectedDayChange)="onSelectedDayChange($event)">
+        </app-calendar>
+
+        <div class="mdw-expenses__list">
+                        <app-transaction-list
+                            [transactions]="transactions"
+                            [enableReactions]="true"
+                            (reactionRequested)="onReactionRequested($event)">
+                        </app-transaction-list>
+        </div>
+
+        <p class="mdw-expenses__hint">Long press an expense for 2 seconds (click on web) to add a reaction.</p>
+    </div>
+</ion-content>

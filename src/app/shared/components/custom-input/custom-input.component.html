@@ -1,3 +1,25 @@
-<p>
-  custom-input works!
-</p>
+<div class="mdw-custom-input">
+  <ion-item class="mdw-custom-input__item" lines="none" [class.mdw-custom-input__item--invalid]="showError">
+    <ion-label position="stacked">{{ label }}</ion-label>
+    <ion-input
+      [type]="type"
+      [value]="value"
+      [placeholder]="placeholder"
+      [inputmode]="inputMode"
+      [autocomplete]="autocomplete"
+      [maxlength]="maxlength"
+      [minlength]="minlength"
+      [readonly]="readonly"
+      [clearInput]="clearInput"
+      [disabled]="isDisabled"
+      (ionInput)="handleInput($event)"
+      (ionBlur)="handleBlur()">
+    </ion-input>
+
+    <ng-content select="[end]"></ng-content>
+  </ion-item>
+
+  <ion-text *ngIf="showError" color="danger" class="mdw-custom-input__error">
+    {{ computedErrorText }}
+  </ion-text>
+</div>

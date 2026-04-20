@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserService } from './core/services/user';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,8 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private userService: UserService) {
+    // Keep reference so the service initializes on app start.
+    void this.userService;
+  }
 }

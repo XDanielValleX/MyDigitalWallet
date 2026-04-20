@@ -1,13 +1,27 @@
 import { TestBed } from '@angular/core/testing';
+import { ModalController } from '@ionic/angular';
 
-import { Modal } from './modal';
+import { ModalService } from './modal';
 
-describe('Modal', () => {
-  let service: Modal;
+describe('ModalService', () => {
+  let service: ModalService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Modal);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ModalController,
+          useValue: {
+            create: async () => ({
+              present: async () => { },
+              onDidDismiss: async () => ({ role: 'dismiss', data: null })
+            }),
+            dismiss: async () => true
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(ModalService);
   });
 
   it('should be created', () => {

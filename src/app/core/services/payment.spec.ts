@@ -1,13 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Payment } from './payment';
+import { FirestoreService } from './firestore';
+import { PaymentService } from './payment';
 
-describe('Payment', () => {
-  let service: Payment;
+describe('PaymentService', () => {
+  let service: PaymentService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Payment);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: FirestoreService,
+          useValue: {
+            addDoc: async () => 'mock-id',
+            updateDoc: async () => { },
+            setDoc: async () => { },
+            list: async () => []
+          }
+        }
+      ]
+    });
+    service = TestBed.inject(PaymentService);
   });
 
   it('should be created', () => {

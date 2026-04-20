@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 // Ajusta esta ruta según donde tengas guardado tu servicio
 import { AuthService } from '../../core/services/auth';
+import { NotificationService } from '../../core/services/notification';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,8 @@ export class LoginPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService // <-- Inyectamos el servicio
+    private authService: AuthService, // <-- Inyectamos el servicio
+    private notify: NotificationService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -34,16 +36,21 @@ export class LoginPage implements OnInit {
         await this.authService.login(email, password);
         console.log('¡Login Exitoso!');
         // Si todo sale bien, lo mandamos a los tabs (al Home)
-        this.router.navigate(['/tabs']);
+        await this.router.navigate(['/tabs']).catch(() => window.location.assign('/tabs'));
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
-        // Más adelante conectaremos el ToastService aquí para mostrar alertas bonitas
-        alert('Credenciales incorrectas o error de conexión.');
+        await this.notify.error('Credenciales incorrectas o error de conexión.');
       }
     }
   }
 
-  loginWithGoogle() {
-    console.log('Iniciando SSO con Google (Capacitor)');
+  async loginWithGoogle() {
+    try {
+      await this.authService.loginWithGoogle();
+      await this.router.navigate(['/tabs']).catch(() => window.location.assign('/tabs'));
+    } catch (error) {
+      console.error('Error al iniciar sesión con Google:', error);
+      await this.notify.error('No se pudo iniciar sesión con Google.');
+    }
   }
 }

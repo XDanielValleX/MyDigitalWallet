@@ -1,0 +1,56 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" type="button" (click)="close()" (pointerup)="close()">
+        <ion-icon slot="icon-only" [icon]="backIcon"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false">
+  <div class="mdw-change-card">
+    <ng-container *ngIf="cards?.length; else emptyState">
+      <div class="mdw-change-card__carousel">
+        <div class="mdw-change-card__viewport" #viewport>
+          <div class="mdw-change-card__track" #track>
+            <div
+              class="mdw-change-card-slide"
+              *ngFor="let item of renderCards; let i = index; trackBy: trackByRenderCard"
+              [class.is-active]="i === renderIndex">
+              <app-card
+                [cardNumber]="item.card.cardNumber"
+                [cardHolder]="item.card.cardHolder"
+                [expDate]="item.card.expDate"
+                [isActive]="true">
+              </app-card>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mdw-change-card__meta" *ngIf="activeCard as card">
+        <div class="mdw-change-card__name">{{ card.cardHolder | titlecase }}</div>
+        <div class="mdw-change-card__sub">{{ getBrandLabel(card.cardNumber) }} - {{ getLast4(card.cardNumber) }}</div>
+      </div>
+
+      <div class="mdw-change-card__actions">
+        <ion-button
+          expand="block"
+          shape="round"
+          class="mdw-set-default-btn"
+          (click)="setAsDefault()"
+          (pointerup)="setAsDefault()">
+          <ion-icon slot="start" name="shield-checkmark-outline"></ion-icon>
+          Set as Default
+        </ion-button>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="mdw-change-card__empty">
+        <p>No cards available.</p>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

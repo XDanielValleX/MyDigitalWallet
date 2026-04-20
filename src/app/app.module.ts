@@ -7,6 +7,8 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
+import { CoreModule } from './core/core-module';
+
 // Importaciones de Firebase
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
@@ -18,7 +20,8 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
-    AppRoutingModule
+    AppRoutingModule,
+    CoreModule
 
   ],
   providers: [

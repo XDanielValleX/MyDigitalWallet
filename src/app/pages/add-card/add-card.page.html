@@ -1,13 +1,112 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>add-card</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <div class="header-design">
+    <ion-toolbar class="transparent-toolbar">
+      <ion-buttons slot="start">
+        <ion-button class="mdw-back-btn" fill="clear" type="button" (click)="backToHome()" (pointerup)="backToHome()">
+          <ion-icon slot="icon-only" [icon]="backIcon"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>Add New Card</ion-title>
+    </ion-toolbar>
+
+    <div class="header-text-container">
+      <p class="subtitle">Securely link your payment method</p>
+    </div>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">add-card</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [scrollY]="false">
+
+  <div class="main-content">
+    <div class="card-wrapper">
+      <div class="preview-card" [ngClass]="cardType" aria-label="Card preview">
+        <div class="preview-card-header">
+          <span>DEBIT</span>
+          <div class="preview-brand" aria-hidden="true">
+            <span *ngIf="cardType === 'visa'" class="visa-text">VISA</span>
+            <div *ngIf="cardType === 'mastercard'" class="mastercard-circles">
+              <div class="circle red"></div>
+              <div class="circle orange"></div>
+            </div>
+            <span *ngIf="cardType === 'unknown'">CARD</span>
+          </div>
+        </div>
+
+        <div class="preview-card-holder">{{ cardHolderVal | uppercase }}</div>
+        <div class="preview-card-number">{{ cardNumberVal }}</div>
+
+        <div class="preview-card-exp">{{ expDateVal }}</div>
+      </div>
+    </div>
+
+    <div class="form-container">
+      <form [formGroup]="cardForm">
+        <ion-list>
+          <app-custom-input
+            class="pill-input"
+            label="Cardholder Name"
+            type="text"
+            placeholder="James Smith"
+            autocomplete="cc-name"
+            formControlName="cardHolder">
+          </app-custom-input>
+
+          <app-custom-input
+            class="pill-input pill-input--number"
+            [class.has-brand]="cardType !== 'unknown'"
+            label="Card Number"
+            type="tel"
+            placeholder="XXXX XXXX XXXX XXXX"
+            autocomplete="cc-number"
+            [maxlength]="19"
+            formControlName="cardNumber"
+            (ionInput)="formatCardNumber($event)">
+
+            <div end class="mdw-card-brand" aria-hidden="true">
+              <span *ngIf="cardType === 'visa'" class="visa-text">VISA</span>
+              <div *ngIf="cardType === 'mastercard'" class="mastercard-circles">
+                <div class="circle red"></div>
+                <div class="circle orange"></div>
+              </div>
+            </div>
+          </app-custom-input>
+
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="6" class="ion-no-padding">
+                <app-custom-input
+                  class="pill-input"
+                  label="Expiry Date"
+                  type="text"
+                  placeholder="MM/YY"
+                  autocomplete="cc-exp"
+                  [maxlength]="5"
+                  formControlName="expDate"
+                  (ionInput)="formatExpDate($event)">
+                </app-custom-input>
+              </ion-col>
+              <ion-col size="6" class="ion-no-padding">
+                <app-custom-input
+                  class="pill-input"
+                  label="CVC"
+                  type="tel"
+                  placeholder="***"
+                  autocomplete="cc-csc"
+                  [maxlength]="4"
+                  formControlName="cvv">
+                </app-custom-input>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-list>
+      </form>
+    </div>
+
+    <div class="footer-btn-container">
+      <ion-button expand="block" shape="round" class="green-submit-btn" (click)="saveCard()"
+        [disabled]="cardForm.invalid || isLoading">
+        {{ isLoading ? 'SAVING...' : 'ADD NEW CARD' }}
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

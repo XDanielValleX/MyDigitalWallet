@@ -1,11 +1,11 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="end">
-      <ion-button color="dark">
+      <ion-button fill="clear" color="medium">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
-      <ion-avatar (click)="openProfile()" class="profile-avatar">
-        <img src="assets/avatar-placeholder.png" />
+      <ion-avatar (click)="openProfile()" (pointerup)="openProfile()" class="profile-avatar">
+        <img src="/assets/avatar-placeholder.svg" alt="Profile" />
       </ion-avatar>
     </ion-buttons>
   </ion-toolbar>
@@ -17,40 +17,58 @@
     <p>Let's save your money.</p>
   </div>
 
+  <app-balance-display [totalBalance]="balance"></app-balance-display>
+
   <div class="card-display-container">
-    <app-card cardNumber="4111 1111 1111 1111" cardHolder="Cesar Diaz" expDate="12/28" [isActive]="true">
-    </app-card>
+    <ng-container *ngIf="isLoading; else cardsLoaded">
+      <app-skeleton-loading variant="card"></app-skeleton-loading>
+    </ng-container>
 
+    <ng-template #cardsLoaded>
+      <ng-container *ngIf="selectedCard; else noCards">
+        <div class="mdw-card-stack" [class.mdw-card-stack--multi]="visibleCards.length > 1">
+          <div
+            class="mdw-card-stack__item"
+            *ngFor="let card of visibleCards; let i = index; trackBy: trackByCardId"
+            [style.zIndex]="100 - i"
+            [style.transform]="'translateY(' + ((visibleCards.length - 1 - i) * 12) + 'px) scale(' + (1 - i * 0.04) + ')'">
+            <app-card
+              [cardNumber]="card.cardNumber"
+              [cardHolder]="card.cardHolder"
+              [expDate]="card.expDate"
+              [isActive]="true">
+            </app-card>
+          </div>
+        </div>
+      </ng-container>
+    </ng-template>
+
+    <ng-template #noCards>
+      <div class="no-cards-state">
+        <div class="placeholder-card-icon">
+          <ion-icon name="card-outline"></ion-icon>
+        </div>
+        <p>No cards available.</p>
+        <ion-button fill="solid" shape="round" size="small" (click)="addCard()">
+          + ADD CARD
+        </ion-button>
+      </div>
+    </ng-template>
   </div>
 
-  <div class="quick-actions-grid">
-    <div class="action-item" (click)="openChangeCardModal()">
-      <div class="icon-wrapper teal">
-        <ion-icon name="layers-outline"></ion-icon>
-      </div>
-      <span>Change Card</span>
-    </div>
-
-    <div class="action-item" (click)="goToPayment()">
-      <div class="icon-wrapper lime">
-        <ion-icon name="card-outline"></ion-icon>
-      </div>
-      <span>Pay Now</span>
-    </div>
-
-    <div class="action-item" (click)="addCard()">
-      <div class="icon-wrapper dark">
-        <ion-icon name="add-outline"></ion-icon>
-      </div>
-      <span>Add Card</span>
-    </div>
-  </div>
+  <app-quick-actions [actions]="homeActions" (action)="onQuickAction($event)"></app-quick-actions>
 
   <div class="history-header">
     <h2>Card History</h2>
-    <ion-note color="primary">View All</ion-note>
+    <ion-note color="primary" role="button" tabindex="0" (click)="openTotalExpenses()" (pointerup)="openTotalExpenses()">View All</ion-note>
   </div>
 
-  <app-transaction-list></app-transaction-list>
+  <ng-container *ngIf="isLoading; else historyLoaded">
+    <app-skeleton-loading variant="transactions" [count]="3"></app-skeleton-loading>
+  </ng-container>
+
+  <ng-template #historyLoaded>
+    <app-transaction-list [transactions]="transactions"></app-transaction-list>
+  </ng-template>
 
 </ion-content>

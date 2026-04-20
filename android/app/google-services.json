@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "3239260508",
+    "project_id": "mydigitalwallet-d46ef",
+    "storage_bucket": "mydigitalwallet-d46ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:3239260508:android:825bcbb62f2e0f49ec9199",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "3239260508-66e2p5utqen2hl3raq600ficit757av2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx7D_AmwPPMMc03-S7fWjALHqwgU4kvQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "3239260508-66e2p5utqen2hl3raq600ficit757av2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
