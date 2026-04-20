@@ -35,7 +35,6 @@ export class AuthService {
       const res = await SocialLogin.login({
         provider: 'google',
         options: {
-          scopes: ['email', 'profile'],
           // Android may cache stale tokens; force a fresh token to avoid invalid credential issues.
           forceRefreshToken: true,
         },
