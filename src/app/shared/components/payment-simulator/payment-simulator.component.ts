@@ -199,10 +199,6 @@ export class PaymentSimulatorComponent {
         createdAt
       });
 
-      await this.sendPushConfirmation(this.uid).catch(err => {
-        console.warn('Push notification failed:', err);
-      });
-
       const elapsed = Date.now() - startedAt;
       if (elapsed < 900) {
         await new Promise(res => setTimeout(res, 900 - elapsed));
@@ -210,6 +206,13 @@ export class PaymentSimulatorComponent {
 
       this.step = 'success';
       await Haptics.impact({ style: ImpactStyle.Light });
+
+      // NotifyPro confirmation should happen AFTER the payment is fully processed.
+      // Show the green toast only when NotifyPro confirms the send.
+      const pushSent = await this.sendPushConfirmation(this.uid);
+      if (pushSent) {
+        await this.presentPaymentSuccessToast();
+      }
     } catch (e) {
       console.error(e);
 	  await this.notify.error('Payment failed.');
@@ -239,6 +242,12 @@ export class PaymentSimulatorComponent {
     this.step = 'confirm';
     this.transactionId = null;
 	this.generateMerchantAndAmount();
+  }
+
+  private async presentPaymentSuccessToast(): Promise<void> {
+    const title = 'Payment Successful';
+    const body = `You have successfully paid an amount of ${this.amountLabel}.`;
+    await this.notify.success(`${title} — ${body}`);
   }
 
   private async verifyIdentityIfNeeded(): Promise<boolean> {
@@ -320,27 +329,36 @@ export class PaymentSimulatorComponent {
     }
 
     if (status === 401 || status === 403) {
-      return 'Sesión de NotifyPro inválida o expirada (vuelve a iniciar sesión en Notificaciones).';
+      return 'Autenticación de NotifyPro inválida o expirada.';
     }
 
     return `HTTP ${status}: ${normalized}`;
   }
 
-  private async sendPushConfirmation(uid: string): Promise<void> {
+  private async sendPushConfirmation(uid: string): Promise<boolean> {
     if (!this.pushEnabled) {
-      return;
+      return false;
     }
 
-    const token = await this.users.ensurePushToken(uid);
+    let token: string | null = null;
+    try {
+      token = await this.users.ensurePushToken(uid);
+    } catch (error) {
+      console.warn('Unable to get push token:', error);
+      token = null;
+    }
     if (!token) {
       await this.notify.info('No se pudo obtener el token de notificaciones (permiso denegado o no disponible).');
-      return;
+      return false;
     }
 
-    const jwt = this.http.getStoredNotificationsJwt();
-    if (!jwt) {
-      await this.notify.info('Push no configurado: inicia sesión en el servicio de notificaciones (ver README) para poder enviarlas.');
-      return;
+    // Auto-login to NotifyPro backend if needed (hardcoded default account).
+    try {
+      await this.http.ensureNotificationsBackendSession();
+    } catch (err) {
+      console.warn('Unable to auto-login NotifyPro backend:', err);
+      await this.notify.error('No se pudo iniciar sesión automáticamente en NotifyPro.');
+      return false;
     }
 
     try {
@@ -351,7 +369,7 @@ export class PaymentSimulatorComponent {
         await this.notify.info(
           `NotifyPro${who} no tiene Firebase configurado. Entra al Dashboard y sube el JSON de Firebase Admin SDK.`
         );
-        return;
+        return false;
       }
     } catch (err) {
       // If status fails, still attempt send and surface the real error.
@@ -374,11 +392,9 @@ export class PaymentSimulatorComponent {
       const email = this.http.getStoredNotificationsJwtEmail();
       const who = email ? ` (${email})` : '';
       await this.notify.error(`No se pudo enviar la notificación push${who}: ${this.describePushSendError(err)}`);
-      return;
+      return false;
     }
 
-    if (!sent) {
-      await this.notify.info('Push no configurado: inicia sesión en el servicio de notificaciones (ver README) para poder enviarlas.');
-    }
+    return sent;
   }
 }

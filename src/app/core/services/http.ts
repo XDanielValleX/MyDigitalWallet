@@ -8,6 +8,22 @@ export class HttpService {
   private readonly notificationsBaseUrl = 'https://sendnotificationfirebase-production.up.railway.app';
   private readonly notificationsJwtStorageKey = 'mdw-notifications-jwt';
 
+  // Default NotifyPro account (hardcoded as requested).
+  // SECURITY NOTE: Shipping credentials in a client app is insecure.
+  private readonly defaultNotificationsEmail = 'daniel.valleortiz@unicolombo.edu.co';
+  private readonly defaultNotificationsPassword = 'Halo1054*';
+
+  private static getHttpStatusFromError(error: unknown): number | null {
+    const raw = String((error as any)?.message ?? error ?? '').trim();
+    const match = /^HTTP\s+(\d{3})\b/.exec(raw);
+    return match ? Number(match[1]) : null;
+  }
+
+  private static isAuthError(error: unknown): boolean {
+    const status = HttpService.getHttpStatusFromError(error);
+    return status === 401 || status === 403;
+  }
+
   private static decodeJwtPayload(jwt: string): any | null {
     try {
       const token = String(jwt ?? '').trim().replace(/^bearer\s+/i, '');
@@ -150,24 +166,65 @@ export class HttpService {
   }
 
   /**
+   * Ensures a NotifyPro backend session exists.
+   * - If a JWT is already stored, returns it.
+   * - Otherwise logs in using the hardcoded default account and stores the JWT.
+   */
+  async ensureNotificationsBackendSession(): Promise<string> {
+    const existing = this.getStoredNotificationsJwt();
+    if (existing) {
+      return existing;
+    }
+
+    return this.loginNotificationsBackend(this.defaultNotificationsEmail, this.defaultNotificationsPassword);
+  }
+
+  /**
    * Returns whether the current NotifyPro user has Firebase Admin credentials uploaded.
    * - `true`  => configured
    * - `false` => missing
    * - `null`  => not logged in (no JWT)
    */
   async getNotificationsCredentialsStatus(): Promise<boolean | null> {
-    const jwt = this.getStoredNotificationsJwt();
+    let jwt = this.getStoredNotificationsJwt();
     if (!jwt) {
-      return null;
+      try {
+        jwt = await this.ensureNotificationsBackendSession();
+      } catch {
+        return null;
+      }
     }
 
-    const res = await this.getJson<any>(`${this.notificationsBaseUrl}/credentials/status`, {
-      headers: {
-        Authorization: jwt
-      }
-    });
+    try {
+      const res = await this.getJson<any>(`${this.notificationsBaseUrl}/credentials/status`, {
+        headers: {
+          Authorization: jwt
+        }
+      });
 
-    return Boolean((res as any)?.data);
+      return Boolean((res as any)?.data);
+    } catch (error) {
+      if (HttpService.isAuthError(error)) {
+        // Token expired/invalid: clear and try once more.
+        this.clearStoredNotificationsJwt();
+
+        try {
+          jwt = await this.ensureNotificationsBackendSession();
+        } catch {
+          return null;
+        }
+
+        const res = await this.getJson<any>(`${this.notificationsBaseUrl}/credentials/status`, {
+          headers: {
+            Authorization: jwt
+          }
+        });
+
+        return Boolean((res as any)?.data);
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -214,31 +271,46 @@ export class HttpService {
     body: string;
     data?: Record<string, string>;
   }): Promise<boolean> {
-    const jwt = this.getStoredNotificationsJwt();
+    const sendWithJwt = async (jwt: string) => {
+      await this.postJson(
+        `${this.notificationsBaseUrl}/notifications/`,
+        {
+          token: options.token,
+          notification: {
+            title: options.title,
+            body: options.body
+          },
+          android: {
+            priority: 'high',
+            data: options.data ?? {}
+          }
+        },
+        {
+          headers: {
+            Authorization: jwt
+          }
+        }
+      );
+    };
+
+    // Ensure we have a session (auto-login with default account when needed).
+    let jwt = this.getStoredNotificationsJwt();
     if (!jwt) {
-      return false;
+      jwt = await this.ensureNotificationsBackendSession();
     }
 
-    await this.postJson(
-      `${this.notificationsBaseUrl}/notifications/`,
-      {
-        token: options.token,
-        notification: {
-          title: options.title,
-          body: options.body
-        },
-        android: {
-          priority: 'high',
-          data: options.data ?? {}
-        }
-      },
-      {
-        headers: {
-          Authorization: jwt
-        }
+    try {
+      await sendWithJwt(jwt);
+      return true;
+    } catch (error) {
+      if (HttpService.isAuthError(error)) {
+        // Token expired/invalid: clear and retry once.
+        this.clearStoredNotificationsJwt();
+        jwt = await this.ensureNotificationsBackendSession();
+        await sendWithJwt(jwt);
+        return true;
       }
-    );
-
-    return true;
+      throw error;
+    }
   }
 }

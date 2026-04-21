@@ -1,9 +1,59 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="end">
-      <ion-button fill="clear" color="medium">
+      <ion-button
+        id="mdw-notifications-btn"
+        class="mdw-notifications-btn"
+        fill="clear"
+        color="medium"
+        (click)="onNotificationsButtonClick()">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+
+        <ng-container *ngIf="(unreadCount$ | async) as unread">
+          <ion-badge
+            *ngIf="unread > 0"
+            class="mdw-notifications-badge"
+            color="danger">
+            {{ unread }}
+          </ion-badge>
+        </ng-container>
+
+        <ion-icon
+          *ngIf="notificationsNeedsSetup"
+          class="mdw-notifications-alert"
+          name="alert-circle"
+          color="warning"></ion-icon>
       </ion-button>
+
+      <ion-popover
+        trigger="mdw-notifications-btn"
+        side="bottom"
+        alignment="end"
+        [showBackdrop]="false"
+        class="mdw-notifications-popover">
+        <ng-template>
+          <ion-content class="mdw-notifications-popover__content">
+            <ion-list lines="none">
+              <ng-container *ngIf="(inbox$ | async) as inbox">
+                <ion-item *ngIf="!inbox.length">
+                  <ion-label>
+                    <ion-note color="medium">No notifications yet.</ion-note>
+                  </ion-label>
+                </ion-item>
+
+                <ion-item *ngFor="let n of inbox">
+                  <ion-label>
+                    <h3>{{ n.title }}</h3>
+                    <p>{{ n.body }}</p>
+                    <ion-note color="medium">{{ formatInboxDate(n.receivedAt) }}</ion-note>
+                  </ion-label>
+                </ion-item>
+              </ng-container>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+
       <ion-avatar (click)="openProfile()" (pointerup)="openProfile()" class="profile-avatar">
         <img src="/assets/avatar-placeholder.svg" alt="Profile" />
       </ion-avatar>

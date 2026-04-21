@@ -78,6 +78,7 @@ Para la gestión de notificaciones push, se utiliza un servicio externo alojado 
 
 - Si inicias sesión con **email/contraseña**, la app intentará autenticar automáticamente en el backend.
 - Si inicias sesión con **Google**, abre **Perfil (avatar) → Push Notifications** y actívalas. Si la app no tiene JWT aún, te pedirá las credenciales del panel NotifyPro para guardarlo en el dispositivo y habilitar el envío de push al finalizar pagos.
+- Al confirmar un pago, la app muestra una notificación local nativa inmediata y luego también intenta enviar el push al backend de Railway/NotifyPro para la entrega remota.
 
 ### Endpoints del Servicio
 

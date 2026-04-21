@@ -524,6 +524,50 @@ app-home .profile-avatar {
 	background: #2b1f6b;
 }
 
+/* Home: notifications bell (badge + setup warning + popover) */
+app-home .mdw-notifications-btn {
+	position: relative;
+}
+
+app-home .mdw-notifications-btn .mdw-notifications-badge {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	min-width: 18px;
+	height: 18px;
+	line-height: 18px;
+	padding: 0 5px;
+	border-radius: 999px;
+	font-size: 0.65rem;
+	font-weight: 800;
+}
+
+app-home .mdw-notifications-btn .mdw-notifications-alert {
+	position: absolute;
+	bottom: 1px;
+	right: 1px;
+	font-size: 14px;
+}
+
+app-home ion-popover.mdw-notifications-popover {
+	--width: 300px;
+	--max-width: 92vw;
+}
+
+app-home .mdw-notifications-popover__content {
+	--padding-top: 6px;
+	--padding-bottom: 6px;
+}
+
+app-home .mdw-notifications-popover__content ion-item h3 {
+	margin: 0;
+	font-weight: 800;
+}
+
+app-home .mdw-notifications-popover__content ion-item p {
+	margin: 4px 0 6px;
+}
+
 app-home .welcome-header {
 	margin-bottom: 30px;
 	color: var(--ion-text-color);

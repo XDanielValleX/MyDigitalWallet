@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { BehaviorSubject } from 'rxjs';
 import { FirestoreService } from './firestore';
-import { NotificationService } from './notification';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -23,6 +24,15 @@ export type UserProfile = {
   updatedAt?: any;
 };
 
+export type InboxNotification = {
+  id: string;
+  title: string;
+  body: string;
+  receivedAt: string;
+  data?: Record<string, any>;
+  seen: boolean;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -39,12 +49,187 @@ export class UserService {
   private pushTokenPromise: Promise<string | null> | null = null;
   private pushListenersReady = false;
 
+  private readonly inboxStorageKey = 'mdw-notifications-inbox-v1';
+  private readonly inboxMaxItems = 25;
+  private readonly inboxSubject = new BehaviorSubject<InboxNotification[]>(this.readStoredInbox());
+  readonly inbox$ = this.inboxSubject.asObservable();
+  private readonly unreadCountSubject = new BehaviorSubject<number>(0);
+  readonly unreadCount$ = this.unreadCountSubject.asObservable();
+
+  private readonly paymentNotificationChannelId = 'mdw-payment-confirmations';
+  private paymentNotificationChannelReady = false;
+
   constructor(
-    private firestore: FirestoreService,
-    private notify: NotificationService
+    private firestore: FirestoreService
   ) {
     this.initTheme();
     this.initBalanceVisibility();
+
+    this.unreadCountSubject.next(this.computeUnreadCount(this.inboxSubject.value));
+
+    if (Capacitor.isNativePlatform()) {
+      // Best-effort: create channel early so both push + local notifications have a high-importance channel.
+      void this.ensurePaymentNotificationChannel();
+    }
+  }
+
+  markAllInboxSeen(): void {
+    const current = this.inboxSubject.value;
+    if (!current.some(n => !n.seen)) {
+      return;
+    }
+
+    const next = current.map(n => ({ ...n, seen: true }));
+    this.inboxSubject.next(next);
+    this.unreadCountSubject.next(0);
+    this.persistInbox(next);
+  }
+
+  private addInboxNotification(input: { title: string; body: string; data?: Record<string, any> }): void {
+    const title = String(input.title ?? '').trim() || 'MyDigitalWallet';
+    const body = String(input.body ?? '').trim();
+    if (!body) {
+      return;
+    }
+
+    const item: InboxNotification = {
+      id: `${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+      title,
+      body,
+      receivedAt: new Date().toISOString(),
+      data: input.data ?? undefined,
+      seen: false,
+    };
+
+    const next = [item, ...this.inboxSubject.value].slice(0, this.inboxMaxItems);
+    this.inboxSubject.next(next);
+    this.unreadCountSubject.next(this.computeUnreadCount(next));
+    this.persistInbox(next);
+  }
+
+  private computeUnreadCount(items: InboxNotification[]): number {
+    let count = 0;
+    for (const n of items) {
+      if (!n.seen) count++;
+    }
+    return count;
+  }
+
+  private readStoredInbox(): InboxNotification[] {
+    try {
+      const raw = localStorage.getItem(this.inboxStorageKey);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+
+      return parsed
+        .map((x: any) => ({
+          id: String(x?.id ?? ''),
+          title: String(x?.title ?? ''),
+          body: String(x?.body ?? ''),
+          receivedAt: String(x?.receivedAt ?? ''),
+          data: (x?.data && typeof x.data === 'object') ? x.data : undefined,
+          seen: Boolean(x?.seen),
+        }))
+        .filter((x: InboxNotification) => Boolean(x.id && x.body));
+    } catch {
+      return [];
+    }
+  }
+
+  private persistInbox(items: InboxNotification[]): void {
+    try {
+      localStorage.setItem(this.inboxStorageKey, JSON.stringify(items));
+    } catch {
+      // ignore
+    }
+  }
+
+  private async ensurePaymentNotificationChannel(): Promise<boolean> {
+    if (this.paymentNotificationChannelReady) {
+      return true;
+    }
+
+    try {
+      await LocalNotifications.createChannel({
+        id: this.paymentNotificationChannelId,
+        name: 'MyDigitalWallet Payments',
+        description: 'Payment confirmations and account updates',
+        importance: 5,
+        visibility: 1,
+        vibration: true,
+      });
+
+      this.paymentNotificationChannelReady = true;
+      return true;
+    } catch (error) {
+      console.warn('Unable to create notifications channel:', error);
+      return false;
+    }
+  }
+
+  private async showForegroundPushAsSystemNotification(payload: any): Promise<void> {
+    const title = String(payload?.title ?? '').trim() || 'MyDigitalWallet';
+    const body = String(payload?.body ?? '').trim();
+    if (!body) {
+      return;
+    }
+
+    // Keep an in-app inbox for the Home "bell" button.
+    this.addInboxNotification({ title, body, data: payload?.data ?? undefined });
+
+    const channelOk = await this.ensurePaymentNotificationChannel();
+    if (!channelOk) {
+      return;
+    }
+
+    // Don't prompt here; permissions should be requested from a user action (Profile toggle).
+    const perm = await LocalNotifications.checkPermissions().catch(() => ({ display: 'prompt' } as any));
+    if (perm.display !== 'granted') {
+      return;
+    }
+
+    try {
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: Math.floor(Date.now() % 2147483647),
+            title,
+            body,
+            channelId: this.paymentNotificationChannelId,
+            autoCancel: true,
+            extra: payload?.data ?? undefined,
+          },
+        ],
+      });
+    } catch (error) {
+      console.warn('Unable to show foreground system notification:', error);
+    }
+  }
+
+  /**
+   * Returns whether the app has OS-level permission to post notifications.
+   * Used for UI warnings (e.g., Home bell yellow alert).
+   */
+  async isNotificationsPermissionGranted(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) {
+      // On web there is no Capacitor notifications permission flow.
+      return true;
+    }
+
+    const [pushPerm, localPerm] = await Promise.all([
+      PushNotifications.checkPermissions().catch(() => ({ receive: 'prompt' } as any)),
+      LocalNotifications.checkPermissions().catch(() => ({ display: 'prompt' } as any)),
+    ]);
+
+    const pushGranted = String((pushPerm as any)?.receive ?? '') === 'granted';
+    const localGranted = String((localPerm as any)?.display ?? '') === 'granted';
+    return pushGranted || localGranted;
   }
 
   getMode(): ThemeMode {
@@ -200,24 +385,19 @@ export class UserService {
       return;
     }
 
-    // Foreground delivery: show a lightweight toast so the user sees something.
+    // Foreground delivery: Android won't show the push in the notification shade while
+    // the app is open, so we mirror it as a local system notification.
     PushNotifications.addListener('pushNotificationReceived', (n) => {
-      const title = String((n as any)?.title ?? '').trim();
-      const body = String((n as any)?.body ?? '').trim();
-      const message = [title, body].filter(Boolean).join(' — ');
-      if (message) {
-        void this.notify.info(message);
-      }
+      void this.showForegroundPushAsSystemNotification(n as any);
     }).catch(() => { });
 
     // When the user taps a notification.
     PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
       const n = (action as any)?.notification ?? null;
-      const title = String(n?.title ?? '').trim();
+      const title = String(n?.title ?? '').trim() || 'MyDigitalWallet';
       const body = String(n?.body ?? '').trim();
-      const message = [title, body].filter(Boolean).join(' — ');
-      if (message) {
-        void this.notify.info(message);
+      if (body) {
+        this.addInboxNotification({ title, body, data: n?.data ?? undefined });
       }
     }).catch(() => { });
   }

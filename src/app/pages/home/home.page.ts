@@ -31,6 +31,11 @@ export class HomePage {
   totalExpense = 0;
   balance = 0;
 
+  // Notifications bell UI
+  readonly inbox$ = this.userService.inbox$;
+  readonly unreadCount$ = this.userService.unreadCount$;
+  notificationsNeedsSetup = false;
+
   private defaultCardId: string | null = null;
 
   private lastNavUrl: string | null = null;
@@ -101,6 +106,8 @@ export class HomePage {
 
         // 3. Obtener transacciones + balance para la tarjeta seleccionada
         await this.loadTransactions(currentUser.uid);
+
+        await this.refreshNotificationsSetupNeeded();
 
       } catch (error) {
         console.error('Error:', error);
@@ -209,7 +216,7 @@ export class HomePage {
     this.profileModalOpen = true;
 
     try {
-      const result = await this.modal.openAndWait(ProfileModalComponent, {
+      await this.modal.openAndWait(ProfileModalComponent, {
         cssClass: 'mdw-profile-modal',
         backdropDismiss: true,
         showBackdrop: true,
@@ -218,12 +225,29 @@ export class HomePage {
         expandToScroll: true,
         handle: true
       });
-      if (result.role === 'saved') {
-        await this.getUserData();
-      }
+      // Refresh Home state after closing profile (push settings can change without pressing "Save").
+      await this.getUserData();
     } finally {
       this.profileModalOpen = false;
     }
+  }
+
+  onNotificationsButtonClick() {
+    // "Unread" means: user hasn't opened this panel.
+    this.userService.markAllInboxSeen();
+  }
+
+  formatInboxDate(iso: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) {
+      return '';
+    }
+    return d.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+  }
+
+  private async refreshNotificationsSetupNeeded(): Promise<void> {
+    const granted = await this.userService.isNotificationsPermissionGranted();
+    this.notificationsNeedsSetup = !granted;
   }
 
   async openTotalExpenses() {
