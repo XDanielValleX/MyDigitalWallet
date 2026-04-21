@@ -51,14 +51,11 @@
       <ion-item class="mdw-profile-item" lines="none">
         <ion-icon slot="start" [icon]="notificationsIcon" aria-hidden="true"></ion-icon>
         <ion-label>
-          <div>Push Notifications</div>
+          <div>Notifications</div>
           <ion-note color="medium">
             {{
               pushEnabled
-                ? (
-                    (pushBackendConfigured ? 'Activadas' : 'Falta configurar') +
-                    (pushBackendEmail ? (' (' + pushBackendEmail + ')') : '')
-                  )
+                ? (notificationsPermissionGranted ? 'Activadas' : 'Faltan permisos')
                 : 'Desactivadas'
             }}
           </ion-note>

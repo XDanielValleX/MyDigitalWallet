@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { Auth, EmailAuthProvider, reauthenticateWithCredential, signOut } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { NativeBiometric } from 'capacitor-native-biometric';
 import { AlertController, ModalController } from '@ionic/angular';
 import { NotificationService } from '../../../core/services/notification';
-import { HttpService } from '../../../core/services/http';
 import { UserService } from '../../../core/services/user';
 import {
     cameraOutline,
@@ -44,8 +44,7 @@ export class ProfileModalComponent implements OnInit {
     biometricsEnabled = false;
     darkMode = false;
 
-    pushBackendConfigured = false;
-    pushBackendEmail: string | null = null;
+    notificationsPermissionGranted = true;
     pushEnabled = true;
 
     constructor(
@@ -55,71 +54,17 @@ export class ProfileModalComponent implements OnInit {
         private alertCtrl: AlertController,
         private router: Router,
         private userService: UserService,
-        private http: HttpService,
         private notify: NotificationService,
         private injector: Injector
     ) { }
 
     ngOnInit() {
         this.darkMode = this.userService.getEffectiveIsDark();
-        void this.refreshPushBackendStatus();
         void this.loadProfile();
     }
 
-    private async refreshPushBackendStatus(): Promise<void> {
-        const hasJwt = Boolean(this.http.getStoredNotificationsJwt());
-        if (!hasJwt) {
-            this.pushBackendConfigured = false;
-            this.pushBackendEmail = null;
-            return;
-        }
-
-        this.pushBackendEmail = this.http.getStoredNotificationsJwtEmail();
-
-        try {
-            const configured = await this.http.getNotificationsCredentialsStatus();
-            this.pushBackendConfigured = configured === true;
-        } catch {
-            // If the status call fails (expired token, network, etc.), consider it not configured.
-            this.pushBackendConfigured = false;
-        }
-    }
-
-    private describeNotificationsLoginError(error: any): string {
-        const rawMessage = String(error?.message ?? error ?? '').trim();
-        if (!rawMessage) {
-            return 'Error desconocido.';
-        }
-
-        // HttpService throws: "HTTP <status>: <body>"
-        const match = /^HTTP\s+(\d{3}):\s*(.*)$/s.exec(rawMessage);
-        if (!match) {
-            return rawMessage;
-        }
-
-        const status = Number(match[1]);
-        const body = String(match[2] ?? '').trim();
-
-        let msg = body;
-        try {
-            const parsed = JSON.parse(body);
-            msg = String(parsed?.msg ?? parsed?.message ?? parsed?.error ?? body);
-        } catch {
-            // keep raw body
-        }
-
-        const normalized = msg.trim();
-        if (/all\s*field/i.test(normalized)) {
-            return `HTTP ${status}: "All field must set" (suele pasar si el correo NO es @unicolombo.edu.co o faltan campos).`;
-        }
-        if (status === 401 || status === 403 || /invalid|credencial/i.test(normalized)) {
-            return `HTTP ${status}: Credenciales inválidas.`;
-        }
-        if (status >= 500) {
-            return `HTTP ${status}: Error del servidor de notificaciones.`;
-        }
-
-        return `HTTP ${status}: ${normalized || 'Error'}`;
+    private async refreshNotificationsPermissionStatus(): Promise<void> {
+        this.notificationsPermissionGranted = await this.userService.isNotificationsPermissionGranted();
     }
 
     async onPushToggle(ev: CustomEvent) {
@@ -139,47 +84,38 @@ export class ProfileModalComponent implements OnInit {
         this.isUpdatingPush = true;
         try {
             if (!nextEnabled) {
+                const alert = await this.alertCtrl.create({
+                    header: 'Desactivar notificaciones',
+                    message: '¿Seguro que deseas desactivar las notificaciones? Puedes activarlas nuevamente cuando quieras.',
+                    buttons: [
+                        { text: 'Cancelar', role: 'cancel' },
+                        { text: 'Desactivar', role: 'confirm' }
+                    ],
+                    backdropDismiss: false,
+                });
+
+                await alert.present();
+                const result = await alert.onDidDismiss();
+                if (result.role !== 'confirm') {
+                    // Revert UI toggle.
+                    this.pushEnabled = true;
+                    return;
+                }
+
                 this.pushEnabled = false;
                 await this.persistPushEnabled(user.uid, false);
-                // Clear backend session so re-enabling forces a fresh login (helps when switching NotifyPro accounts).
-                this.http.clearStoredNotificationsJwt();
-                await this.refreshPushBackendStatus();
+                await this.refreshNotificationsPermissionStatus();
                 await this.notify.info('Notificaciones desactivadas.');
                 return;
             }
 
-            // Enabling push: ensure the notifications backend JWT is configured.
-            await this.refreshPushBackendStatus();
-
-            // If backend is not configured (either no JWT, expired JWT, or missing Firebase JSON), prompt login.
-            if (!this.pushBackendConfigured) {
-                const creds = await this.promptPushBackendCredentials();
-                if (!creds) {
-                    this.pushEnabled = false;
-                    await this.persistPushEnabled(user.uid, false);
-                    return;
-                }
-
-                try {
-                    await this.http.loginNotificationsBackend(creds.email, creds.password);
-                } catch (error) {
-                    console.error('Notifications backend login failed:', error);
-                    this.pushEnabled = false;
-                    await this.persistPushEnabled(user.uid, false);
-                    await this.notify.error(`No se pudo iniciar sesión: ${this.describeNotificationsLoginError(error)}`);
-                    return;
-                }
-
-                await this.refreshPushBackendStatus();
+            // Request OS permissions needed to actually DISPLAY the notification (especially in foreground).
+            if (Capacitor.isNativePlatform()) {
+                await LocalNotifications.requestPermissions().catch(() => { });
             }
+            await this.userService.ensurePushToken(user.uid).catch(() => null);
 
-            if (!this.pushBackendConfigured) {
-                const email = this.http.getStoredNotificationsJwtEmail();
-                const who = email ? ` (${email})` : '';
-                await this.notify.info(
-                    `NotifyPro no está configurado${who}: entra al Dashboard y sube el JSON de Firebase Admin SDK para poder enviar notificaciones.`
-                );
-            }
+            await this.refreshNotificationsPermissionStatus();
 
             this.pushEnabled = true;
             await this.persistPushEnabled(user.uid, true);
@@ -187,74 +123,6 @@ export class ProfileModalComponent implements OnInit {
         } finally {
             this.isUpdatingPush = false;
         }
-    }
-
-    private async promptPushBackendCredentials(): Promise<{ email: string; password: string } | null> {
-        let email = String(this.auth.currentUser?.email ?? '').trim();
-        if (email && !email.toLowerCase().endsWith('@unicolombo.edu.co')) {
-            // NotifyPro backend appears to be restricted to institutional emails.
-            email = '';
-        }
-        let password = '';
-
-        const alert = await this.alertCtrl.create({
-            header: 'Notificaciones push',
-            message: 'Ingresa tus credenciales de NotifyPro. Nota: el backend solo acepta correos @unicolombo.edu.co.',
-            inputs: [
-                {
-                    name: 'email',
-                    type: 'email',
-                    placeholder: 'correo@unicolombo.edu.co',
-                    value: email,
-                    attributes: {
-                        autocapitalize: 'off',
-                        autocomplete: 'email',
-                    }
-                },
-                {
-                    name: 'password',
-                    type: 'password',
-                    placeholder: 'Password',
-                    attributes: {
-                        autocapitalize: 'off',
-                        autocomplete: 'current-password',
-                    }
-                }
-            ],
-            buttons: [
-                {
-                    text: 'Cancel',
-                    role: 'cancel'
-                },
-                {
-                    text: 'Connect',
-                    role: 'confirm',
-                    handler: (data) => {
-                        email = String((data as any)?.email ?? '').trim();
-                        password = String((data as any)?.password ?? '');
-                    }
-                }
-            ],
-            backdropDismiss: false,
-        });
-
-        await alert.present();
-        const result = await alert.onDidDismiss();
-        if (result.role !== 'confirm') {
-            return null;
-        }
-
-        if (!email) {
-            await this.notify.error('Email is required.');
-            return null;
-        }
-
-        if (!password) {
-            await this.notify.error('Password is required.');
-            return null;
-        }
-
-        return { email, password };
     }
 
     private async persistPushEnabled(uid: string, enabled: boolean): Promise<void> {
@@ -328,6 +196,8 @@ export class ProfileModalComponent implements OnInit {
             this.lastName = data.lastName ?? '';
             this.biometricsEnabled = Boolean(data.biometricsEnabled);
             this.pushEnabled = data.pushEnabled !== false;
+
+            await this.refreshNotificationsPermissionStatus();
         } catch (error) {
             console.error('Error loading profile:', error);
         } finally {

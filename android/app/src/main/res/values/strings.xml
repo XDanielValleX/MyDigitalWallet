@@ -4,4 +4,7 @@
     <string name="title_activity_main">MyDigitalWallet</string>
     <string name="package_name">io.ionic.starter</string>
     <string name="custom_url_scheme">io.ionic.starter</string>
+
+    <!-- FCM default channel for notification messages (Android O+) -->
+    <string name="default_notification_channel_id">mdw-payment-confirmations</string>
 </resources>
